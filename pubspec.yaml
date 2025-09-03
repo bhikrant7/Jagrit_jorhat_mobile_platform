@@ -1,0 +1,43 @@
+name: flutter_application_2
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  http: ^0.13.6
+  flutter_dotenv: ^5.1.0
+  image_picker: ^1.0.4
+  permission_handler: ^11.3.0
+  device_info_plus: ^9.1.1
+  file_picker: ^9.0.0
+  flutter_secure_storage: ^9.0.0
+  flutter:
+    sdk: flutter
+  provider: ^6.1.5
+  lottie: ^2.7.0  # or latest
+  intl: ^0.20.2
+  url_launcher: ^6.3.2
+  open_file: ^3.2.1
+  flutter_pdfview: ^1.2.7
+  flutter_cached_pdfview: ^0.4.1
+  path_provider: ^2.0.11
+  dropdown_button2: ^2.3.9
+
+
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
+    - assets/animations/Loading Screen.json
+    - assets/animations/Success.json
+    - .env
