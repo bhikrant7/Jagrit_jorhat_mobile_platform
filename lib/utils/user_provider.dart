@@ -23,7 +23,7 @@ class UserProvider extends ChangeNotifier {
     required String cId,
     required String firstName,
     required String lastName,
-    required String email,
+    String? email,
     required String phone,
     required String address,
     required String addressType, // Added addressType

@@ -2,7 +2,7 @@ class UserModel {
   final String cId;
   final String firstName;
   final String lastName;
-  final String email;
+  final String? email;
   final String phone;
   final String address;
   final String addressType;
@@ -23,7 +23,7 @@ class UserModel {
     required this.cId,
     required this.firstName,
     required this.lastName,
-    required this.email,
+    this.email,
     required this.phone,
     required this.address,
     required this.addressType,

@@ -85,20 +85,19 @@ class _OtpScreenUtilState extends State<OtpScreenUtil> {
             listen: false,
           );
           userProvider.setUser(
-            cId: userJson['c_id'].toString(),
-            phone: userJson['phone'],
-            firstName: userJson['f_name'],
-            lastName: userJson['l_name'],
-            email: userJson['email'],
+            cId: userJson['c_id']?.toString() ?? '',
+            phone: userJson['phone'] ?? '',
+            firstName: userJson['f_name'] ?? '',
+            lastName: userJson['l_name'] ?? '',
+            email: userJson['email'] ?? '',
             address: userJson['address'] ?? '',
-            addressType: userJson['address_type'] ?? 'rural', // default to 'rural'
+            addressType: userJson['address_type'] ?? 'rural',
             gaonPanchayat: userJson['gaon_panchayat'] ?? '',
+            ward: userJson['ward'] ?? '',
             block: userJson['block'] ?? '',
             circleOffice: userJson['circle_office'] ?? '',
-            // district: userJson['district'] ?? '',
-            // state: userJson['state'] ?? '',
-            emailVerifiedAt: userJson['email_verified_at'],
-            rememberToken: userJson['rememberToken'],
+            emailVerifiedAt: userJson['email_verified_at'] ?? '',
+            rememberToken: userJson['remember_token'] ?? '', // fixed key
             createdAt: userJson['created_at'] ?? '',
             updatedAt: userJson['updated_at'] ?? '',
           );

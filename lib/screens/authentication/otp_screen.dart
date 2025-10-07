@@ -82,7 +82,7 @@ class _OtpScreenState extends State<OtpScreen> {
           phone: userJson['phone'],
           firstName: userJson['f_name'],
           lastName: userJson['l_name'],
-          email: userJson['email'],
+          email: userJson['email'] ?? '',
           address: userJson['address'] ?? '',
           addressType: userJson['address_type'] ?? 'rural', // default to 'rural'
           gaonPanchayat: userJson['gaon_panchayat'] ?? '',

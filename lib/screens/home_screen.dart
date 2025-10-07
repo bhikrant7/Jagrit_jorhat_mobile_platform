@@ -82,15 +82,40 @@ class _HomeScreenState extends State<HomeScreen> {
     );
     _blockController = TextEditingController(text: user.block ?? "");
 
-    // Determine initial address type from existing data
-    final hasPanchayat = (user.gaonPanchayat ?? '').trim().isNotEmpty;
-    final hasWard = (user.ward ?? '').trim().isNotEmpty;
-    if (hasPanchayat) {
-      _addressType = "Rural";
-    } else if (hasWard) {
-      _addressType = "Urban";
+    //determine address type and prefill accordingly
+    if ((user.addressType ?? '').trim().isNotEmpty) {
+      final addr = user.addressType!.trim();
+      if (addr.toLowerCase() == "rural") {
+        _addressType = "Rural";
+        _panchayatController.text = user.gaonPanchayat ?? ""; // prefill
+        _wardController.clear(); // clear opposite field
+      } else if (addr.toLowerCase() == "urban") {
+        _addressType = "Urban";
+        _wardController.text = user.ward ?? ""; // prefill
+        _panchayatController.clear();
+      } else {
+        _addressType = null;
+        _panchayatController.clear();
+        _wardController.clear();
+      }
     } else {
-      _addressType = null; // force user to select
+      // fallback if addressType is missing
+      final hasPanchayat = (user.gaonPanchayat ?? '').trim().isNotEmpty;
+      final hasWard = (user.ward ?? '').trim().isNotEmpty;
+
+      if (hasPanchayat) {
+        _addressType = "Rural";
+        _panchayatController.text = user.gaonPanchayat!;
+        _wardController.clear();
+      } else if (hasWard) {
+        _addressType = "Urban";
+        _wardController.text = user.ward!;
+        _panchayatController.clear();
+      } else {
+        _addressType = null;
+        _panchayatController.clear();
+        _wardController.clear();
+      }
     }
 
     // Preselect dropdowns if existing values match options
@@ -111,6 +136,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+
+    // ✅ Prevent crash when user is null after logout
+    if (userProvider.firstName == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
     return SafeArea(
       child: Scaffold(
         backgroundColor: const Color(0xFFF5F7FA),
@@ -761,7 +792,7 @@ Future<Map<String, dynamic>> _updateUser(Map<String, String> formData) async {
     } else {
       return {
         "success": false,
-        "message": "Server error: ${response.statusCode}"
+        "message": "Server error: ${response.statusCode}",
       };
     }
   } catch (e) {

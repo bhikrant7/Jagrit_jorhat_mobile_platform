@@ -8,7 +8,6 @@ import 'dart:io';
 import 'package:flutter_application_2/utils/user_provider.dart';
 import 'package:provider/provider.dart';
 
-
 class SubmissionHistoryScreen extends StatefulWidget {
   const SubmissionHistoryScreen({super.key});
 
@@ -278,10 +277,19 @@ class _SubmissionHistoryScreenState extends State<SubmissionHistoryScreen> {
                       children: [
                         ElevatedButton.icon(
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => TrackStatusScreen(
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(24),
+                                ),
+                              ),
+                              builder: (_) => SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height *
+                                    0.8, // 80% height drawer
+                                child: TrackStatusScreen(
                                   applicationId: int.parse(
                                     s['a_id'].toString(),
                                   ),
@@ -289,6 +297,7 @@ class _SubmissionHistoryScreenState extends State<SubmissionHistoryScreen> {
                               ),
                             );
                           },
+
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF4187C5),
                             shape: RoundedRectangleBorder(
@@ -326,7 +335,6 @@ class _SubmissionHistoryScreenState extends State<SubmissionHistoryScreen> {
     );
   }
 }
-
 
 String getFileUrl(String raw) {
   if (raw.startsWith("http")) return raw;

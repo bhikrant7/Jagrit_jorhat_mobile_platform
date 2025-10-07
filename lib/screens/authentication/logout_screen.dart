@@ -24,6 +24,8 @@ class _LogoutScreenState extends State<LogoutScreen> {
     await UserSecureStorage.instance.clearAll(); // ✅ Clear secure storage
     userProvider.clearUser(); // ✅ Clear provider
 
+    await Future.delayed(const Duration(milliseconds: 200));
+
     // Navigate back to Entry screen and remove all previous routes
     if (!mounted) return;
     Navigator.pushAndRemoveUntil(
@@ -35,8 +37,6 @@ class _LogoutScreenState extends State<LogoutScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(child: CircularProgressIndicator()),
-    );
+    return const Scaffold(body: Center(child: CircularProgressIndicator()));
   }
 }

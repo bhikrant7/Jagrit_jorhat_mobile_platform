@@ -518,6 +518,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       "email": emailController.text,
                                       "phoneNumber": phoneNumberController.text,
                                       "address": addressController.text,
+                                      "address_type": urbanOrRural?.toLowerCase() ?? 'rural',
                                       "gaonPanchayat":
                                           gaonPanchayatController.text,
                                       "block": blockController.text,
@@ -535,7 +536,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       email: emailController.text,
                                       phone: phoneNumberController.text,
                                       address: addressController.text,
-                                      addressType: urbanOrRural ?? 'rural',
+                                      addressType: urbanOrRural?.toLowerCase() ?? 'rural',
                                       gaonPanchayat:
                                           gaonPanchayatController.text,
                                       block: blockController.text,
