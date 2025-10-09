@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_2/models/case_category_model.dart';
 import 'package:flutter_application_2/screens/success_screen.dart';
 import 'package:flutter_application_2/utils/user_provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -27,6 +28,73 @@ class _ApplicationFormState extends State<ApplicationForm> {
   final TextEditingController descController = TextEditingController();
   PlatformFile? selectedFile;
   bool isSubmitting = false;
+
+  //MODIFIED
+  List<CaseCategory> _categories = [];
+  CaseCategory? _selectedCategory;
+  bool _isLoadingCategories = true;
+  bool _isIssueFieldEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCategories(); // ✨ NEW: Fetch categories when the form loads
+  }
+
+  // ✨ NEW: Function to fetch categories from your server
+  Future<void> _fetchCategories() async {
+    try {
+      final useEmulator = dotenv.env['USE_EMULATOR'] == 'true';
+      final apiUrl = (Platform.isAndroid && useEmulator)
+          ? dotenv.env['API_URL_EMULATOR']
+          : dotenv.env['API_URL'];
+
+      final uri = Uri.parse('$apiUrl/get_categories.php');
+      final response = await http.get(uri).timeout(const Duration(seconds: 20));
+
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+        if (body['success'] == true) {
+          final List<dynamic> data = body['data'];
+          final fetchedCategories = data
+              .map((json) => CaseCategory.fromJson(json))
+              .toList();
+
+          setState(() {
+            _categories = fetchedCategories;
+            // Always add the "Other" option
+            _categories.add(CaseCategory(id: 'other', name: 'Other'));
+            _isLoadingCategories = false;
+
+            // ✨ NEW: If the fetched list was empty, enable the issue field by default.
+            // The dropdown will only contain "Other".
+            if (fetchedCategories.isEmpty) {
+              _isIssueFieldEnabled = true;
+            }
+          });
+        } else {
+          throw Exception('Failed to load categories: ${body['message']}');
+        }
+      } else {
+        throw Exception('Failed to connect to the server');
+      }
+    } catch (e) {
+      // ✏️ MODIFIED: If there's any error, enable the issue field for manual entry.
+      setState(() {
+        _isLoadingCategories = false;
+        _isIssueFieldEnabled = true; // Enable field on error
+      });
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Could not load categories. Please enter the issue manually.',
+            ),
+          ),
+        );
+      }
+    }
+  }
 
   void handleFilePicked(String path) async {
     final file = File(path);
@@ -107,6 +175,8 @@ class _ApplicationFormState extends State<ApplicationForm> {
           setState(() {
             selectedFile = null;
             selectedFilePath = null;
+            _selectedCategory = null; // Reset the category
+            _isIssueFieldEnabled = false; // Disable issue field again
           });
 
           if (context.mounted) {
@@ -157,6 +227,7 @@ class _ApplicationFormState extends State<ApplicationForm> {
         appBar: AppBar(
           title: const Text("Application Form"),
           backgroundColor: const Color(0xFF4187C5),
+          foregroundColor: Colors.white,
         ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
@@ -165,6 +236,65 @@ class _ApplicationFormState extends State<ApplicationForm> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // ✏️ MODIFIED: Conditionally show the Category section
+                if (_isLoadingCategories)
+                  const Center(
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 16.0),
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
+                // Only show the dropdown if we successfully loaded categories
+                else if (_categories.length >
+                    1) // >1 because "Other" is always present
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Case Category",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18.0,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      DropdownButtonFormField<CaseCategory>(
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 16,
+                          ),
+                        ),
+                        value: _selectedCategory,
+                        hint: const Text('Select a category'),
+                        isExpanded: true,
+                        items: _categories.map((CaseCategory category) {
+                          return DropdownMenuItem<CaseCategory>(
+                            value: category,
+                            child: Text(category.name),
+                          );
+                        }).toList(),
+                        onChanged: (CaseCategory? newValue) {
+                          setState(() {
+                            _selectedCategory = newValue;
+                            if (newValue != null && newValue.name == 'Other') {
+                              _isIssueFieldEnabled = true;
+                              issueController.clear();
+                            } else {
+                              _isIssueFieldEnabled = false;
+                              issueController.text = newValue?.name ?? '';
+                            }
+                          });
+                        },
+                        validator: (value) =>
+                            value == null ? 'Please select a category' : null,
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
+
+                // Issue TextFormField
                 const Text(
                   "Issue",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
@@ -172,11 +302,18 @@ class _ApplicationFormState extends State<ApplicationForm> {
                 const SizedBox(height: 6),
                 TextFormField(
                   controller: issueController,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
+                  enabled: _isIssueFieldEnabled,
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    filled: !_isIssueFieldEnabled,
+                    fillColor: Colors.grey[300],
+                    hintText: _isIssueFieldEnabled
+                        ? 'Please specify your issue'
+                        : '',
                   ),
-                  validator: (val) =>
-                      val == null || val.isEmpty ? 'Please enter issue' : null,
+                  validator: (val) => val == null || val.isEmpty
+                      ? 'Please enter the issue'
+                      : null,
                 ),
                 const SizedBox(height: 16),
 

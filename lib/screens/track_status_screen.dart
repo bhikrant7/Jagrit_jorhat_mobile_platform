@@ -1,4 +1,5 @@
 import 'dart:convert';
+// import 'package:flutter/foundation.dart'; // Import for debugPrint
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/widgets/track_status_timeline.dart';
 import 'package:http/http.dart' as http;
@@ -18,35 +19,58 @@ class TrackStatusScreen extends StatelessWidget {
 
     final url = Uri.parse('$apiUrl/track_status.php?a_id=$applicationId');
 
+    // DEBUG: Log the URL we are about to call
+    debugPrint("🚀 [API] Fetching status from URL: $url");
+
     try {
       final res = await http.get(url);
 
+      // DEBUG: Log the response status code and the raw body
+      debugPrint("📦 [API] Response Status Code: ${res.statusCode}");
+      debugPrint("📦 [API] Response Body: ${res.body}");
+
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body);
+
+        // DEBUG: Log the decoded JSON data
+        debugPrint("✅ [API] Decoded Data: $data");
+
         if (data is Map<String, dynamic> && data['success'] == true) {
+          debugPrint("👍 [API] Request successful. Returning data.");
           return List.from(data['data']);
         } else {
+          debugPrint(
+            "👎 [API] Server returned success=false or invalid format.",
+          );
           throw Exception(data['message'] ?? 'Unknown error from server');
         }
       } else {
+        debugPrint("❌ [API] HTTP Error occurred.");
         throw Exception('HTTP ${res.statusCode}: Failed to fetch data');
       }
     } catch (e) {
+      // DEBUG: Log any exception caught during the process
+      debugPrint("🛑 [API] An error occurred in fetchStatus: $e");
       throw Exception("Failed to fetch status: $e");
     }
   }
 
   String formatDateTime(String timestamp) {
+    // DEBUG: Log the input to the formatter
+    debugPrint("Formatting timestamp: '$timestamp'");
     try {
       final dt = DateTime.parse(timestamp);
       return DateFormat('dd MMM yyyy, hh:mm a').format(dt);
     } catch (_) {
+      debugPrint("⚠️ Could not parse timestamp. Returning original value.");
       return timestamp;
     }
   }
 
   /// Choose gradient based on status
   LinearGradient getGradient(String status) {
+    // DEBUG: Log the status used to determine the gradient
+    debugPrint("Getting gradient for status: '$status'");
     switch (status.toLowerCase()) {
       case 'forwarded':
         return const LinearGradient(
@@ -84,21 +108,24 @@ class TrackStatusScreen extends StatelessWidget {
   }
 
   Icon getTypeIcon(String type) {
+    // DEBUG: Log the type used to determine the icon
+    debugPrint("Getting icon for type: '$type'");
     switch (type.toLowerCase()) {
       case 'forwarded':
-        return Icon(Icons.check_circle, color: Colors.green);
+        return const Icon(Icons.check_circle, color: Colors.green);
       case 'pending':
-        return Icon(Icons.hourglass_empty, color: Colors.orange);
+        return const Icon(Icons.hourglass_empty, color: Colors.orange);
       case 'rejected':
       case 'blocked':
-        return Icon(Icons.cancel, color: Colors.red);
+        return const Icon(Icons.cancel, color: Colors.red);
       default:
-        return Icon(Icons.info, color: Colors.grey);
+        return const Icon(Icons.info, color: Colors.grey);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("🛠️ TrackStatusScreen building...");
     return Column(
       children: [
         // Drawer "handle"
@@ -118,32 +145,47 @@ class TrackStatusScreen extends StatelessWidget {
             fontWeight: FontWeight.w800,
             fontSize: 20,
             color: Color(0xFF4187C5),
-            
           ),
         ),
         const SizedBox(height: 12),
 
         Expanded(
           child: FutureBuilder<List<dynamic>>(
-             future: fetchStatus(),
-            // future: Future.delayed(
-            //   const Duration(seconds: 1),
-            //   () => dummyStatusData,
-            // ),
+            future: fetchStatus(),
             builder: (context, snapshot) {
+              // DEBUG: Log the state of the FutureBuilder
+              debugPrint("🔄 FutureBuilder state: ${snapshot.connectionState}");
+
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
+                // DEBUG: Log the error received by the FutureBuilder
+                debugPrint("🔥 FutureBuilder Error: ${snapshot.error}");
                 return Center(child: Text("❌ ${snapshot.error}"));
               }
 
               final data = snapshot.data ?? [];
+              // DEBUG: Log the data received by the FutureBuilder
+              debugPrint("📊 FutureBuilder has data: $data");
+
               if (data.isEmpty) {
                 return const Center(child: Text("No status updates yet"));
               }
 
+              // 👇 ADD THIS TRANSFORMATION LOGIC
+              final formattedData = data.map((item) {
+                return {
+                  'remark': item['remark'],
+                  'department': item['department'],
+                  'created_at': item['created_at'],
+                  'status': item['type'], // <-- Rename 'type' to 'status'
+                };
+              }).toList();
+
               return TrackStatusTimeline(
-                statusList: List<Map<String, dynamic>>.from(data),
+                statusList: List<Map<String, dynamic>>.from(
+                  formattedData,
+                ), // <-- Use the new list
               );
             },
           ),
@@ -152,148 +194,9 @@ class TrackStatusScreen extends StatelessWidget {
     );
   }
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     appBar: AppBar(
-  //       backgroundColor: const Color(0xFF4187C5),
-  //       foregroundColor: Colors.white,
-  //       title: const Text(
-  //         "Track Application Status",
-  //         style: TextStyle(fontWeight: FontWeight.bold),
-  //       ),
-  //     ),
-  //     // body: FutureBuilder<List<dynamic>>(
-  //     //   future: fetchStatus(),
-  //     //   builder: (context, snapshot) {
-  //         body: FutureBuilder<List<dynamic>>(
-  //           future: Future.delayed(const Duration(seconds: 1), () {
-  //             return [
-  //               {
-  //                 'department': 'Circle Office',
-  //                 'created_at': '2025-08-20T10:30:00',
-  //                 'status': 'forwarded',
-  //               },
-  //               {
-  //                 'department': 'District Collector Office',
-  //                 'created_at': '2025-08-20T12:15:00',
-  //                 'status': 'forwarded',
-  //               },
-  //               {
-  //                 'department': 'Block Office',
-  //                 'created_at': '2025-08-20T11:00:00',
-  //                 'status': 'rejected',
-  //               },
-  //             ];
-  //           }),
-  //           builder: (context, snapshot) {
-  //         if (snapshot.connectionState == ConnectionState.waiting) {
-  //           return const Center(child: CircularProgressIndicator());
-  //         } else if (snapshot.hasError) {
-  //           return Center(child: Text("❌ ${snapshot.error}"));
-  //         }
-
-  //         final data = snapshot.data ?? [];
-  //         if (data.isEmpty) {
-  //           return Padding(
-  //             padding: const EdgeInsets.all(12.0),
-  //             child: Container(
-  //               padding: const EdgeInsets.all(16),
-  //               decoration: BoxDecoration(
-  //                 gradient: getGradient("pending"),
-  //                 borderRadius: BorderRadius.circular(16),
-  //                 boxShadow: [
-  //                   BoxShadow(
-  //                     color: Colors.black.withOpacity(0.15),
-  //                     blurRadius: 10,
-  //                     offset: const Offset(0, 5),
-  //                   ),
-  //                 ],
-  //               ),
-  //               child: const ListTile(
-  //                 leading: CircleAvatar(
-  //                   backgroundColor: Colors.white,
-  //                   child: Icon(Icons.hourglass_empty, color: Colors.orange),
-  //                 ),
-  //                 title: Text(
-  //                   "Pending at DC office",
-  //                   style: TextStyle(
-  //                     color: Colors.white,
-  //                     fontWeight: FontWeight.bold,
-  //                   ),
-  //                 ),
-  //               ),
-  //             ),
-  //           );
-  //         }
-
-  //         return ListView.builder(
-  //           padding: const EdgeInsets.all(12),
-  //           itemCount: data.length,
-  //           itemBuilder: (context, index) {
-  //             final item = data[index];
-  //             final dept = item['department']?.toString() ?? 'Unknown Dept';
-  //             final time = formatDateTime(item['created_at'] ?? '');
-  //             final type = item['status']?.toString() ?? 'pending';
-
-  //             return AnimatedContainer(
-  //               duration: const Duration(milliseconds: 400),
-  //               margin: const EdgeInsets.symmetric(vertical: 8),
-  //               decoration: BoxDecoration(
-  //                 gradient: getGradient(type),
-  //                 borderRadius: BorderRadius.circular(16),
-  //                 boxShadow: [
-  //                   BoxShadow(
-  //                     color: Colors.black.withOpacity(0.15),
-  //                     blurRadius: 10,
-  //                     offset: const Offset(0, 5),
-  //                   ),
-  //                 ],
-  //               ),
-  //               child: ListTile(
-  //                 leading: CircleAvatar(
-  //                   backgroundColor: Colors.white,
-  //                   child: getTypeIcon(type),
-  //                 ),
-  //                 title: Text(
-  //                   dept,
-  //                   style: const TextStyle(
-  //                     color: Colors.white,
-  //                     fontSize: 16,
-  //                     fontWeight: FontWeight.bold,
-  //                   ),
-  //                 ),
-  //                 subtitle: Text(
-  //                   "🕒 $time",
-  //                   style: const TextStyle(color: Colors.white70),
-  //                 ),
-  //                 trailing: Container(
-  //                   padding: const EdgeInsets.symmetric(
-  //                     horizontal: 12,
-  //                     vertical: 6,
-  //                   ),
-  //                   decoration: BoxDecoration(
-  //                     color: Colors.white.withOpacity(0.25),
-  //                     borderRadius: BorderRadius.circular(12),
-  //                   ),
-  //                   child: Text(
-  //                     type.toUpperCase(),
-  //                     style: const TextStyle(
-  //                       color: Colors.white,
-  //                       fontWeight: FontWeight.bold,
-  //                     ),
-  //                   ),
-  //                 ),
-  //               ),
-  //             );
-  //           },
-  //         );
-  //       },
-  //     ),
-  //   );
-  // }
+  // The commented-out code from your original file remains here
+  // ...
 }
-
 
 final dummyStatusData = [
   {

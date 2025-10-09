@@ -53,10 +53,11 @@ $circle  = $data['circleOffice'];
 
 // Prepare SQL without c_id if it is AUTO_INCREMENT
 $sql = "INSERT INTO users (
-    f_name, l_name, email, phone, address,address_type,
+    f_name, l_name, email, phone, address, address_type,
     gaon_panchayat, ward, block, circle_office,
     created_at, updated_at
-) VALUES (?,?,?,?,?,?,?,?,?, NOW(), NOW())";
+) VALUES (?,?,?,?,?,?,?,?,?,?, NOW(), NOW())";
+
 
 $stmt = $conn->prepare($sql);
 

@@ -10,7 +10,7 @@
 
 
     <application
-        android:label="flutter_application_2"
+        android:label="Jagrit Jorhat"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
     android:usesCleartextTraffic="true">

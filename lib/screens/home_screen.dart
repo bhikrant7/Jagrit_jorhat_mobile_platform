@@ -4,7 +4,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/screens/application_form.dart';
 import 'package:flutter_application_2/screens/submission_history_screen.dart';
-import 'package:flutter_application_2/screens/test_screen.dart';
+// import 'package:flutter_application_2/screens/test_screen.dart';
 import 'package:flutter_application_2/utils/user_provider.dart';
 import 'package:flutter_application_2/utils/user_secure_storage.dart';
 import 'package:flutter_application_2/widgets/action_card.dart';
@@ -244,18 +244,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
                     const SizedBox(height: 20),
-                    ActionCard(
-                      icon: Icons.analytics_rounded,
-                      label: 'Test Action',
-                      color: exitColor,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const TestScreen()),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 20),
+                    // ActionCard(
+                    //   icon: Icons.analytics_rounded,
+                    //   label: 'Test Action',
+                    //   color: exitColor,
+                    //   onTap: () {
+                    //     Navigator.push(
+                    //       context,
+                    //       MaterialPageRoute(builder: (_) => const TestScreen()),
+                    //     );
+                    //   },
+                    // ),
+                    // const SizedBox(height: 20),
                   ],
                 ),
               ),
@@ -710,6 +710,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             block: _blockController.text.trim(),
                           );
 
+                          // ignore: use_build_context_synchronously
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
@@ -722,6 +723,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             _isEditing = false;
                           });
                         } else {
+                          // ignore: use_build_context_synchronously
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(

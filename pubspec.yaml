@@ -1,6 +1,6 @@
 name: flutter_application_2
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 version: 0.1.0
 
 environment:
@@ -17,7 +17,7 @@ dependencies:
   flutter:
     sdk: flutter
   provider: ^6.1.5
-  lottie: ^2.7.0  # or latest
+  lottie: ^2.7.0 # or latest
   intl: ^0.20.2
   url_launcher: ^6.3.2
   open_file: ^3.2.1
@@ -27,17 +27,21 @@ dependencies:
   dropdown_button2: ^2.3.9
   timeline_tile: ^2.0.0
 
-
-
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/LOGO_APP.png"
 
 flutter:
   uses-material-design: true
   assets:
+    - assets/LOGO_APP.png
     - assets/
     - assets/animations/Loading Screen.json
     - assets/animations/Success.json
