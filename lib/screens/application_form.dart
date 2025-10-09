@@ -251,7 +251,7 @@ class _ApplicationFormState extends State<ApplicationForm> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "Case Category",
+                        "Case Category (গোচৰৰ শ্ৰেণী)",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
@@ -296,7 +296,7 @@ class _ApplicationFormState extends State<ApplicationForm> {
 
                 // Issue TextFormField
                 const Text(
-                  "Issue",
+                  "Issue (সমস্যা)",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
                 ),
                 const SizedBox(height: 6),
@@ -318,7 +318,7 @@ class _ApplicationFormState extends State<ApplicationForm> {
                 const SizedBox(height: 16),
 
                 const Text(
-                  "Reference No./Application No. (If any)",
+                  "Reference No./Application No. (আবেদন নং) (If any/যদি থাকে)",
                   style: TextStyle(fontSize: 18.0),
                 ),
                 const SizedBox(height: 6),
@@ -331,7 +331,7 @@ class _ApplicationFormState extends State<ApplicationForm> {
                 const SizedBox(height: 16),
 
                 const Text(
-                  "Description",
+                  "Description (বিৱৰণ)",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
                 ),
                 const SizedBox(height: 6),
@@ -347,6 +347,7 @@ class _ApplicationFormState extends State<ApplicationForm> {
                 ),
                 const SizedBox(height: 16),
 
+                const Text("ফাইল আপলোড কৰক (যদি আছে)"),
                 const Text("Upload File (If any)"),
                 const SizedBox(height: 6),
                 FilePickerDrawer(onFilePicked: handleFilePicked),
@@ -385,7 +386,7 @@ class _ApplicationFormState extends State<ApplicationForm> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          child: const Text("Submit"),
+                          child: const Text("Submit (জমা দিন)"),
                         ),
                 ),
 
@@ -394,7 +395,7 @@ class _ApplicationFormState extends State<ApplicationForm> {
                   child: TextButton(
                     onPressed: () => Navigator.pop(context),
                     child: const Text(
-                      "← Go Back",
+                      "← Go Back (পিছলৈ যাওক)",
                       style: TextStyle(color: Colors.blue, fontSize: 16),
                     ),
                   ),

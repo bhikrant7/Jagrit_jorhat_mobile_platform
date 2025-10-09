@@ -52,7 +52,7 @@ class GlassContent extends StatelessWidget {
                   children: [
                     const Expanded(
                       child: WelcomeButton(
-                        buttonText: 'Login',
+                        buttonText: 'Log-in\n(লগ-ইন)',
                         onTap: LoginScreen(),
                         color: Color.fromARGB(0, 36, 47, 148),
                         textColor: Colors.white,
@@ -65,7 +65,7 @@ class GlassContent extends StatelessWidget {
                     ),
                     Expanded(
                       child: WelcomeButton(
-                        buttonText: 'Register',
+                        buttonText: 'Register\n(পঞ্জীয়ন)',
                         onTap: RegisterScreen(),
                         color: Colors.white,
                         textColor: Color.fromARGB(255, 0, 89, 155),

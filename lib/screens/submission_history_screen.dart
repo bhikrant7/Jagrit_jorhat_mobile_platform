@@ -225,7 +225,7 @@ class _SubmissionHistoryScreenState extends State<SubmissionHistoryScreen> {
                           Icon(Icons.attach_file, size: 18, color: Colors.grey),
                           SizedBox(width: 6),
                           Text(
-                            "Attachment:",
+                            "Attachment (সংলগ্নক):",
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ],
@@ -245,7 +245,7 @@ class _SubmissionHistoryScreenState extends State<SubmissionHistoryScreen> {
                             );
                           },
                           icon: const Icon(Icons.picture_as_pdf),
-                          label: const Text("View PDF"),
+                          label: const Text("View PDF (PDF চাওক)"),
                         )
                       else
                         ClipRRect(
@@ -265,7 +265,7 @@ class _SubmissionHistoryScreenState extends State<SubmissionHistoryScreen> {
                         ),
                     ] else
                       const Text(
-                        "No file attached",
+                        "No file attached (কোনো ফাইল সংলগ্ন কৰা নাই)",
                         style: TextStyle(color: Colors.grey),
                       ),
 
@@ -315,7 +315,7 @@ class _SubmissionHistoryScreenState extends State<SubmissionHistoryScreen> {
                             color: Colors.white,
                           ),
                           label: const Text(
-                            'Track',
+                            'Track (ট্ৰেক)',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 14,

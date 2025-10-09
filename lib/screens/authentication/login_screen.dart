@@ -53,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
         final userData = UserModel.fromJson(result['user']);
         //  Show success message
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result['message'] ?? "OTP sent successfully")),
+          SnackBar(content: Text(result['message'] ?? "OTP sent successfully(OTP সফলতাৰে প্ৰেৰণ কৰা হৈছে)")),
         );
         final phoneNum = phoneController.text;
         //  Clear inputs
@@ -127,20 +127,25 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 10.0),
                       const Text(
-                        'Please login to continue',
+                        'আগবাঢ়ি যাবলৈ অনুগ্ৰহ কৰি লগইন কৰক',
                         style: TextStyle(fontSize: 14, color: Colors.black45),
                       ),
-                      const SizedBox(height: 40.0),
+                      const Text(
+                        'Please login to continue',
+                        style: TextStyle(fontSize: 18, color: Colors.black45),
+                      ),
+                      
+                      const SizedBox(height: 34.0),
 
                       //  Phone
                       TextFormField(
                         controller: phoneController,
                         keyboardType: TextInputType.phone,
                         validator: (value) => value == null || value.isEmpty
-                            ? 'Please enter phone number'
+                            ? 'Please enter phone number (অনুগ্ৰহ কৰি আপোনাৰ ফোন নম্বৰ দিয়ক)'
                             : null,
                         decoration: _inputDecoration(
-                          'Phone Number',
+                          'Phone Number (ফোন নম্বৰ)',
                           Icons.phone,
                         ),
                       ),
@@ -189,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             }
                           },
                           child: const Text(
-                            'Login',
+                            'Login (লগ-ইন)',
                             style: TextStyle(fontSize: 18, color: Colors.white),
                           ),
                         ),

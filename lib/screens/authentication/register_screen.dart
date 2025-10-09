@@ -41,20 +41,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String? selectedCircle;
 
   final List<String> blockOptions = [
-    'East Teok',
-    'Central Jorhat',
-    'East Jorhat',
-    'Kaliapani',
-    'North West Jorhat',
-    'Titabor',
+    'East Teok\n(পূব তেওক)',
+    'Central Jorhat\n(মধ্য জোৰহাট)',
+    'East Jorhat\n(পূব জোৰহাট)',
+    'Kaliapani\n(কলিয়াপানী)',
+    'North West Jorhat\n(উত্তৰ-পশ্চিম জোৰহাট)',
+    'Titabor\n(তিতাবৰ)',
   ];
 
   final List<String> circleOptions = [
-    'Titabor Rev. Circle',
-    'Teok Rev. Circle',
-    'Mariani Rev. Circle',
-    'East Rev. Circle',
-    'West Rev. Circle',
+    'Titabor Rev. Circle\n(তিতাবৰ ৰেভিনিউ চাৰ্কল)',
+    'Teok Rev. Circle\n(তেওক ৰেভিনিউ চাৰ্কল)',
+    'Mariani Rev. Circle\n(মাৰিয়ানী ৰেভিনিউ চাৰ্কল)',
+    'East Rev. Circle\n(পূব ৰেভিনিউ চাৰ্কল)',
+    'West Rev. Circle\n(পশ্চিম ৰেভিনিউ চাৰ্কল)',
   ];
 
   bool agreePersonalData = true;
@@ -135,7 +135,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         children: [
                           Expanded(
                             child: _buildTextField(
-                              'First Name',
+                              'First Name\n(প্ৰথম নাম)',
                               'Enter First Name',
                               firstNameController,
                             ),
@@ -143,7 +143,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           const SizedBox(width: 10),
                           Expanded(
                             child: _buildTextField(
-                              'Last Name',
+                              'Last Name\n(উপাধি)',
                               'Enter Last Name',
                               lastNameController,
                             ),
@@ -153,19 +153,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       const SizedBox(height: 25.0),
 
                       _buildTextField(
-                        'Email address(* optional)',
+                        'Email address (ইমেইল ঠিকনা)(* optional)',
                         'Enter email address',
                         emailController,
                       ),
                       const SizedBox(height: 25.0),
                       _buildTextField(
-                        'Phone Number',
+                        'Phone Number (ফোন নম্বৰ)',
                         'Enter phone number',
                         phoneNumberController,
                       ),
                       const SizedBox(height: 25.0),
                       _buildTextField(
-                        'Address',
+                        'Address (ঠিকনা)',
                         'Enter Address',
                         addressController,
                       ),
@@ -180,7 +180,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               isExpanded: true,
                               value: selectedCircle,
                               hint: const Text(
-                                "Select Circle Office",
+                                "Select Circle Office (চাৰ্কল কাৰ্যালয়)",
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: Colors.grey,
@@ -290,7 +290,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 isExpanded: true,
                                 value: selectedBlock,
                                 hint: const Text(
-                                  "Select Block",
+                                  "Select Block (ব্লক)",
                                   style: TextStyle(
                                     fontSize: 16,
                                     color: Colors.grey,
@@ -398,7 +398,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const Text(
-                                  'Address Type:',
+                                  'Address Type: (ঠিকনাৰ ধৰণ)',
                                   style: TextStyle(fontSize: 16),
                                 ),
                                 const SizedBox(height: 8),
@@ -431,13 +431,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       padding: EdgeInsets.symmetric(
                                         horizontal: 20,
                                       ),
-                                      child: Text("Urban"),
+                                      child: Text("Urban (নগৰ)"),
                                     ),
                                     Padding(
                                       padding: EdgeInsets.symmetric(
                                         horizontal: 20,
                                       ),
-                                      child: Text("Rural"),
+                                      child: Text("Rural (গ্ৰাম্য)"),
                                     ),
                                   ],
                                 ),
@@ -449,13 +449,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           // Show Ward or Gaon Panchayat based on Urban/Rural
                           if (urbanOrRural == 'Rural')
                             _buildTextField(
-                              'Gaon Panchayat',
+                              'Gaon Panchayat (গাঁও পঞ্চায়েত)',
                               'Enter Gaon Panchayat',
                               gaonPanchayatController,
                             )
                           else if (urbanOrRural == 'Urban')
                             _buildTextField(
-                              'Ward',
+                              'Ward (ৱাৰ্ড)',
                               'Enter Ward',
                               wardController,
                             ),
@@ -464,6 +464,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                       const SizedBox(height: 16),
 
+                      
                       Row(
                         children: [
                           Checkbox(
@@ -644,7 +645,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   ),
                                 )
                               : const Text(
-                                  'Sign up',
+                                  'Sign up (চাইন আপ)',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,

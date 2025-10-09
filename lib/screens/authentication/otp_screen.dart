@@ -84,7 +84,8 @@ class _OtpScreenState extends State<OtpScreen> {
           lastName: userJson['l_name'],
           email: userJson['email'] ?? '',
           address: userJson['address'] ?? '',
-          addressType: userJson['address_type'] ?? 'rural', // default to 'rural'
+          addressType:
+              userJson['address_type'] ?? 'rural', // default to 'rural'
           gaonPanchayat: userJson['gaon_panchayat'] ?? '',
           ward: userJson['ward'] ?? '',
           block: userJson['block'] ?? '',
@@ -167,7 +168,7 @@ class _OtpScreenState extends State<OtpScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        'Verify OTP',
+                        'Verify OTP (অ’টিপি পৰীক্ষা কৰক)',
                         style: TextStyle(
                           fontSize: 30.0,
                           fontWeight: FontWeight.w900,
@@ -175,6 +176,13 @@ class _OtpScreenState extends State<OtpScreen> {
                         ),
                       ),
                       const SizedBox(height: 10.0),
+                      Text(
+                        '${widget.user.phone} ফোন নম্বৰত প্ৰেৰণ কৰা অ’টিপি',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.black45,
+                        ),
+                      ),
                       Text(
                         'OTP sent to ${widget.user.phone}',
                         style: const TextStyle(
@@ -192,7 +200,7 @@ class _OtpScreenState extends State<OtpScreen> {
                             (value == null ||
                                 value.isEmpty ||
                                 value.length != 6)
-                            ? 'Enter a valid 6-digit OTP'
+                            ? 'Enter a valid 6-digit OTP(এটা বৈধ ৬-অংকৰ OTP সুমুৱাওক)'
                             : null,
                         decoration: _inputDecoration('Enter OTP', Icons.lock),
                       ),
@@ -210,7 +218,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                   color: Colors.white,
                                 )
                               : const Text(
-                                  'Verify',
+                                  'Verify(সত্যাপন কৰক)',
                                   style: TextStyle(
                                     fontSize: 18,
                                     color: Colors.white,

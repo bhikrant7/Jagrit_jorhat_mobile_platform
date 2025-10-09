@@ -183,13 +183,20 @@ class _OtpScreenUtilState extends State<OtpScreenUtil> {
                       ),
                       const SizedBox(height: 10.0),
                       Text(
-                        'OTP sent to ${widget.phone}',
+                        '${widget.user?.phone} ফোন নম্বৰত প্ৰেৰণ কৰা অ’টিপি',
                         style: const TextStyle(
                           fontSize: 14,
                           color: Colors.black45,
                         ),
                       ),
-                      const SizedBox(height: 40.0),
+                      Text(
+                        'OTP sent to ${widget.user?.phone}',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: Colors.black45,
+                        ),
+                      ),
+                      const SizedBox(height: 30.0),
 
                       // OTP Field
                       TextFormField(
@@ -199,9 +206,9 @@ class _OtpScreenUtilState extends State<OtpScreenUtil> {
                             (value == null ||
                                 value.isEmpty ||
                                 value.length != 6)
-                            ? 'Enter a valid 6-digit OTP'
+                            ? 'Enter a valid 6-digit OTP(এটা বৈধ ৬-অংকৰ OTP সুমুৱাওক)'
                             : null,
-                        decoration: _inputDecoration('Enter OTP', Icons.lock),
+                        decoration: _inputDecoration('Enter OTP (অ’টিপি প্ৰৱেশ কৰক)', Icons.lock),
                       ),
                       const SizedBox(height: 30.0),
 
@@ -217,7 +224,7 @@ class _OtpScreenUtilState extends State<OtpScreenUtil> {
                                   color: Colors.white,
                                 )
                               : const Text(
-                                  'Verify',
+                                  'Verify (সত্যাপন কৰক)',
                                   style: TextStyle(
                                     fontSize: 18,
                                     color: Colors.white,
@@ -262,7 +269,7 @@ class _OtpScreenUtilState extends State<OtpScreenUtil> {
                                 }
                               },
                         child: Text(
-                          'Resend OTP',
+                          'Resend OTP (অ’টিপি পুনৰ পঠাওক)',
                           style: TextStyle(color: primaryColor),
                         ),
                       ),
