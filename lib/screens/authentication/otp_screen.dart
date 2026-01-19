@@ -179,7 +179,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       Text(
                         '${widget.user.phone} ফোন নম্বৰত প্ৰেৰণ কৰা অ’টিপি',
                         style: const TextStyle(
-                          fontSize: 14,
+                          fontSize: 16,
                           color: Colors.black45,
                         ),
                       ),
@@ -281,15 +281,21 @@ class _OtpScreenState extends State<OtpScreen> {
   InputDecoration _inputDecoration(String label, IconData icon) {
     return InputDecoration(
       label: Text(label),
-      hintText: label,
-      prefixIcon: Icon(icon),
-      border: OutlineInputBorder(
-        borderSide: const BorderSide(color: Colors.black12),
-        borderRadius: BorderRadius.circular(10),
-      ),
+
+      labelStyle: TextStyle(color: Colors.black45, fontWeight: FontWeight.w700),
+      hintText: 'Enter $label',
+      hintStyle: const TextStyle(color: Colors.black26),
+      prefixIcon: Icon(icon, color: primaryColor),
+
+      // filled: true,
+      // fillColor: Colors.grey, // Very light grey background
       enabledBorder: OutlineInputBorder(
-        borderSide: const BorderSide(color: Colors.black12),
-        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: Colors.black12, width: 2.0),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: primaryColor, width: 2.0), // Glow effect
+        borderRadius: BorderRadius.circular(12),
       ),
     );
   }

@@ -19,7 +19,42 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _formLoginKey = GlobalKey<FormState>();
   final Color primaryColor = const Color.fromARGB(255, 65, 135, 197);
+  final Color primaryBgColor = const Color.fromRGBO(237, 232, 228, 1);
   bool obscurePassword = true;
+
+  void _showCustomSnackBar({
+    // required BuildContext context,
+    required String message,
+    bool isError = false,
+  }) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              isError ? Icons.error_outline : Icons.check_circle_outline,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: isError ? Colors.redAccent : Colors.green[600],
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
 
   //  Add controllers
   final TextEditingController phoneController = TextEditingController();
@@ -52,9 +87,20 @@ class _LoginScreenState extends State<LoginScreen> {
       if (response.statusCode == 200 && result['success'] == true) {
         final userData = UserModel.fromJson(result['user']);
         //  Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result['message'] ?? "OTP sent successfully(OTP সফলতাৰে প্ৰেৰণ কৰা হৈছে)")),
+        _showCustomSnackBar(
+          message:
+              result['message'] ??
+              "OTP sent successfully(OTP সফলতাৰে প্ৰেৰণ কৰা হৈছে)",
+          isError: false,
         );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(
+        //     content: Text(
+        //       result['message'] ??
+        //           "OTP sent successfully(OTP সফলতাৰে প্ৰেৰণ কৰা হৈছে)",
+        //     ),
+        //   ),
+        // );
         final phoneNum = phoneController.text;
         //  Clear inputs
         phoneController.clear();
@@ -73,23 +119,26 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       } else if (result['message'] == "User not found") {
         //  Show user not found message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("User not found, please register first"),
-          ),
+        _showCustomSnackBar(
+          message:
+              "User not found, please register first(ব্যৱহাৰকাৰী পোৱা নগ'ল, অনুগ্ৰহ কৰি প্ৰথমে পঞ্জীয়ন কৰক)",
+          isError: true,
         );
         Navigator.pushNamed(context, '/register');
       } else {
         //  Show error message from backend
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result['message'] ?? "Login failed")),
+        _showCustomSnackBar(
+          message: result['message'] ?? "Login failed (লগ-ইন বিফল)",
+          isError: true,
         );
       }
     } catch (e) {
       if (!mounted) return;
       debugPrint("Error at login: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Network error, try again later")),
+      _showCustomSnackBar(
+        message:
+            "Network error, try again later (নেটৱৰ্ক ত্ৰুটি, পাছত পুনৰ চেষ্টা কৰক)",
+        isError: true,
       );
     }
   }
@@ -99,133 +148,151 @@ class _LoginScreenState extends State<LoginScreen> {
     return CustomBgScaffold(
       child: Column(
         children: [
+          // Top spacing to show background
           const Expanded(flex: 1, child: SizedBox(height: 10)),
+
           Expanded(
             flex: 7,
             child: Container(
-              padding: const EdgeInsets.fromLTRB(25.0, 50.0, 25.0, 20.0),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
+              padding: const EdgeInsets.fromLTRB(
+                25.0,
+                50.0,
+                25.0,
+                0.0,
+              ), // Removed bottom padding here
+              decoration: BoxDecoration(
+                color: primaryBgColor,
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(40.0),
                   topRight: Radius.circular(40.0),
                 ),
               ),
-              child: SingleChildScrollView(
-                child: Form(
-                  key: _formLoginKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Welcome Back!',
-                        style: TextStyle(
-                          fontSize: 30.0,
-                          fontWeight: FontWeight.w900,
-                          color: primaryColor,
+              child: Column(
+                // Added this Column to hold the ScrollView and Footer together
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Form(
+                        key: _formLoginKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Center(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(22.0),
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 3.0,
+                                  ),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                  child: Image.asset(
+                                    'assets/ddd.gif',
+                                    height: 100,
+                                    width: 100,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 20.0),
+                            const SizedBox(height: 10.0),
+                            const Text(
+                              'নাগৰিকৰ লগ-ইন',
+                              textAlign:
+                                  TextAlign.center, // Center text for better UI
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black54,
+                              ),
+                            ),
+                            const Text(
+                              'Please login to continue',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black54,
+                              ),
+                            ),
+                            const SizedBox(height: 34.0),
+
+                            // Phone Field
+                            TextFormField(
+                              controller: phoneController,
+                              keyboardType: TextInputType.phone,
+                              validator: (value) =>
+                                  value == null || value.isEmpty
+                                  ? 'Please enter phone number (অনুগ্ৰহ কৰি আপোনাৰ ফোন নম্বৰ দিয়ক)'
+                                  : null,
+                              decoration: _inputDecoration(
+                                'Phone Number (ফোন নং)',
+                                Icons.phone,
+                              ),
+                            ),
+                            const SizedBox(height: 25.0),
+
+                            // Login Button
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: primaryColor,
+                                ),
+                                onPressed: () {
+                                  if (_formLoginKey.currentState!.validate()) {
+                                    _loginUser();
+                                  }
+                                },
+                                child: const Text(
+                                  'Login (লগ-ইন)',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 30.0),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 10.0),
-                      const Text(
-                        'আগবাঢ়ি যাবলৈ অনুগ্ৰহ কৰি লগইন কৰক',
-                        style: TextStyle(fontSize: 14, color: Colors.black45),
-                      ),
-                      const Text(
-                        'Please login to continue',
-                        style: TextStyle(fontSize: 18, color: Colors.black45),
-                      ),
-                      
-                      const SizedBox(height: 34.0),
-
-                      //  Phone
-                      TextFormField(
-                        controller: phoneController,
-                        keyboardType: TextInputType.phone,
-                        validator: (value) => value == null || value.isEmpty
-                            ? 'Please enter phone number (অনুগ্ৰহ কৰি আপোনাৰ ফোন নম্বৰ দিয়ক)'
-                            : null,
-                        decoration: _inputDecoration(
-                          'Phone Number (ফোন নম্বৰ)',
-                          Icons.phone,
-                        ),
-                      ),
-                      const SizedBox(height: 25.0),
-
-                      // //  Password
-                      // TextFormField(
-                      //   controller: passwordController,
-                      //   obscureText: obscurePassword,
-                      //   obscuringCharacter: '*',
-                      //   validator: (value) => value == null || value.isEmpty
-                      //       ? 'Please enter password'
-                      //       : null,
-                      //   decoration: _inputDecoration(
-                      //     'Password',
-                      //     Icons.lock,
-                      //     isPassword: true,
-                      //   ),
-                      // ),
-                      // const SizedBox(height: 10),
-
-                      // Align(
-                      //   alignment: Alignment.centerRight,
-                      //   child: TextButton(
-                      //     onPressed: () {
-                      //       Navigator.pushNamed(context, '/forgot-password');
-                      //     },
-                      //     child: Text(
-                      //       'Forgot Password?',
-                      //       style: TextStyle(color: primaryColor),
-                      //     ),
-                      //   ),
-                      // ),
-                      // const SizedBox(height: 20.0),
-
-                      //  Login Button
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: primaryColor,
-                          ),
-                          onPressed: () {
-                            if (_formLoginKey.currentState!.validate()) {
-                              _loginUser();
-                            }
-                          },
-                          child: const Text(
-                            'Login (লগ-ইন)',
-                            style: TextStyle(fontSize: 18, color: Colors.white),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 30.0),
-
-                      // Row(
-                      //   mainAxisAlignment: MainAxisAlignment.center,
-                      //   children: [
-                      //     const Text(
-                      //       "Don't have an account? ",
-                      //       style: TextStyle(color: Colors.black45),
-                      //     ),
-                      //     GestureDetector(
-                      //       onTap: () {
-                      //         Navigator.pushNamed(context, '/register');
-                      //       },
-                      //       child: Text(
-                      //         'Sign up',
-                      //         style: TextStyle(
-                      //           fontWeight: FontWeight.bold,
-                      //           color: primaryColor,
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   ],
-                      // ),
-                      // const SizedBox(height: 20.0),
-                    ],
+                    ),
                   ),
-                ),
+
+                  // --- Footer Section (Inside White Region) ---
+                  Visibility(
+                    visible: MediaQuery.of(context).viewInsets.bottom == 0,
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 20.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                'assets/govt_assam_white__.png',
+                                height: 40,
+                              ),
+                              const SizedBox(width: 12),
+                              const Text(
+                                'Government of Assam',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontStyle: FontStyle.italic,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black45,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Only show the bottom padding when the keyboard is closed
+                        SizedBox(height: MediaQuery.of(context).padding.bottom),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -241,14 +308,16 @@ class _LoginScreenState extends State<LoginScreen> {
   }) {
     return InputDecoration(
       label: Text(label),
+
+      labelStyle: TextStyle(color: Colors.black45, fontWeight: FontWeight.w700),
       hintText: 'Enter $label',
       hintStyle: const TextStyle(color: Colors.black26),
-      prefixIcon: Icon(icon),
+      prefixIcon: Icon(icon, color: primaryColor),
       suffixIcon: isPassword
           ? IconButton(
               icon: Icon(
                 obscurePassword ? Icons.visibility_off : Icons.visibility,
-                color: Colors.grey,
+                color: Colors.black38,
               ),
               onPressed: () {
                 setState(() {
@@ -257,13 +326,16 @@ class _LoginScreenState extends State<LoginScreen> {
               },
             )
           : null,
-      border: OutlineInputBorder(
-        borderSide: const BorderSide(color: Colors.black12),
-        borderRadius: BorderRadius.circular(10),
-      ),
+
+      // filled: true,
+      // fillColor: Colors.grey, // Very light grey background
       enabledBorder: OutlineInputBorder(
-        borderSide: const BorderSide(color: Colors.black12),
-        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: Colors.black12, width: 2.0),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: primaryColor, width: 2.0), // Glow effect
+        borderRadius: BorderRadius.circular(12),
       ),
     );
   }

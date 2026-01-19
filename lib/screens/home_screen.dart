@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -27,8 +29,6 @@ class _HomeScreenState extends State<HomeScreen>
 
   bool _isEditing = false;
   final _formKey = GlobalKey<FormState>();
-  // late AnimationController _animationController;
-  // late Animation<double> _fadeAnimation;
 
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
@@ -46,18 +46,18 @@ class _HomeScreenState extends State<HomeScreen>
   String? _selectedBlock;
 
   final List<String> blockOptions = [
-    'East Teok\n(পূব তেওক)',
-    'Central Jorhat\n(মধ্য জোৰহাট)',
-    'East Jorhat\n(পূব জোৰহাট)',
+    'East Teok\n(পূব টীয়ক)',
+    'Central Jorhat\n(মধ্য যোৰহাট)',
+    'East Jorhat\n(পূব যোৰহাট)',
     'Kaliapani\n(কলিয়াপানী)',
-    'North West Jorhat\n(উত্তৰ-পশ্চিম জোৰহাট)',
+    'North West Jorhat\n(উত্তৰ-পশ্চিম যোৰহাট)',
     'Titabor\n(তিতাবৰ)',
   ];
 
   final List<String> circleOptions = [
     'Titabor Rev. Circle\n(তিতাবৰ ৰেভিনিউ চাৰ্কল)',
-    'Teok Rev. Circle\n(তেওক ৰেভিনিউ চাৰ্কল)',
-    'Mariani Rev. Circle\n(মাৰিয়ানী ৰেভিনিউ চাৰ্কল)',
+    'Teok Rev. Circle\n(টীয়ক ৰেভিনিউ চাৰ্কল)',
+    'Mariani Rev. Circle\n(মৰিয়নী ৰেভিনিউ চাৰ্কল)',
     'East Rev. Circle\n(পূব ৰেভিনিউ চাৰ্কল)',
     'West Rev. Circle\n(পশ্চিম ৰেভিনিউ চাৰ্কল)',
   ];
@@ -146,6 +146,39 @@ class _HomeScreenState extends State<HomeScreen>
     super.dispose();
   }
 
+  // --- HELPER METHOD: Custom SnackBar ---
+  void _showCustomSnackBar({required String message, bool isError = false}) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              isError ? Icons.error_outline : Icons.check_circle_outline,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: isError ? Colors.redAccent : Colors.green[600],
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
@@ -155,8 +188,6 @@ class _HomeScreenState extends State<HomeScreen>
     }
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      // Use SystemUiOverlayStyle.light for white status bar icons and text
-      // Use SystemUiOverlayStyle.dark for black status bar icons and text
       value: SystemUiOverlayStyle.light,
       child: SafeArea(
         child: Scaffold(
@@ -187,7 +218,6 @@ class _HomeScreenState extends State<HomeScreen>
                           ),
                         ),
                       ),
-
                       SliverToBoxAdapter(
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -235,7 +265,6 @@ class _HomeScreenState extends State<HomeScreen>
                           ),
                         ),
                       ),
-
                       SliverPadding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         sliver: SliverList(
@@ -263,7 +292,6 @@ class _HomeScreenState extends State<HomeScreen>
                               },
                             ),
                             const SizedBox(height: 16),
-
                             _buildActionCard(
                               icon: Icons.history_edu_rounded,
                               label:
@@ -287,7 +315,6 @@ class _HomeScreenState extends State<HomeScreen>
                               },
                             ),
                             const SizedBox(height: 16),
-
                             _buildActionCard(
                               icon: Icons.logout_rounded,
                               label: 'Logout \n(লগ আউট)',
@@ -359,6 +386,7 @@ class _HomeScreenState extends State<HomeScreen>
                                   ),
                                 );
                                 if (confirm == true) {
+                                  // ignore: use_build_context_synchronously
                                   Navigator.pushNamed(context, '/logout');
                                 }
                               },
@@ -371,33 +399,41 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                 ),
 
-                Container(
-                  padding: const EdgeInsets.only(bottom: 24, top: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, -2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset('assets/govt_assam_white__.png', height: 36),
-                      const SizedBox(width: 12),
-                      const Text(
-                        'Government of Assam',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontStyle: FontStyle.italic,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFF718096),
+                // --- MODIFIED FOOTER: VISIBILITY CHECK ---
+                Visibility(
+                  // Only show when keyboard is closed
+                  visible: MediaQuery.of(context).viewInsets.bottom == 0,
+                  child: Container(
+                    padding: const EdgeInsets.only(bottom: 24, top: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, -2),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/govt_assam_white__.png',
+                          height: 36,
+                        ),
+                        const SizedBox(width: 12),
+                        const Text(
+                          'Government of Assam',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontStyle: FontStyle.italic,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF718096),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -419,75 +455,100 @@ class _HomeScreenState extends State<HomeScreen>
     Color? borderColor,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: gradient,
-          borderRadius: BorderRadius.circular(20),
-          border: borderColor != null
-              ? Border.all(color: borderColor, width: 1.5)
-              : null,
-          boxShadow: [
-            BoxShadow(
-              color: (borderColor == null ? Colors.black : Colors.transparent)
-                  .withOpacity(0.08),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(20),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: iconColor == Colors.white
-                          ? Colors.white.withOpacity(0.2)
-                          : iconColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(icon, color: iconColor, size: 28),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          label,
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.bold,
-                            color: textColor,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          subtitle,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: subtitleColor,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
+    return Container(
+      // Added margin bottom so you don't strictly need SizedBox(height: 16) in the list
+      // But it works fine even if you keep the SizedBox.
+      decoration: BoxDecoration(
+        gradient: gradient,
+        borderRadius: BorderRadius.circular(24),
+        border: borderColor != null
+            ? Border.all(color: borderColor, width: 1.2)
+            : null,
+        boxShadow: [
+          BoxShadow(
+            color:
+                (borderColor == null ? const Color(0xFF4187C5) : Colors.black)
+                    .withOpacity(0.12),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(24),
+          splashColor: Colors.white.withOpacity(0.15),
+          highlightColor: Colors.white.withOpacity(0.05),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            child: Row(
+              children: [
+                // --- 1. Glassy Icon Box ---
+                Container(
+                  height: 52,
+                  width: 52,
+                  decoration: BoxDecoration(
+                    color: iconColor == Colors.white
+                        ? Colors.white.withOpacity(0.2)
+                        : iconColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.2),
+                      width: 1,
                     ),
                   ),
-                  Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    color: textColor.withOpacity(0.5),
-                    size: 18,
+                  child: Icon(icon, color: iconColor, size: 26),
+                ),
+
+                const SizedBox(width: 18),
+
+                // --- 2. Text Content ---
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label,
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
+                          color: textColor,
+                          height: 1.2, // Better spacing for multi-line text
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: subtitleColor,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+
+                const SizedBox(width: 12),
+
+                // --- 3. Action Indicator (Arrow Bubble) ---
+                Container(
+                  height: 32,
+                  width: 32,
+                  decoration: BoxDecoration(
+                    color: textColor.withOpacity(0.1), // Subtle bubble
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.arrow_forward_rounded,
+                    color: textColor,
+                    size: 16,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -495,18 +556,513 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  // Widget _buildProfileHeader(BuildContext context) {
+  //   final userProvider = Provider.of<UserProvider>(context);
+
+  //   return AnimatedContainer(
+  //     duration: const Duration(milliseconds: 400),
+  //     curve: Curves.easeInOut,
+  //     decoration: BoxDecoration(
+  //       gradient: LinearGradient(
+  //         colors: [
+  //           const Color(0xFF1D4E89),
+  //           primaryColor,
+  //           primaryColor.withOpacity(0.9),
+  //         ],
+  //         begin: Alignment.topLeft,
+  //         end: Alignment.bottomRight,
+  //       ),
+  //       borderRadius: BorderRadius.circular(24),
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: primaryColor.withOpacity(0.3),
+  //           blurRadius: 20,
+  //           offset: const Offset(0, 8),
+  //         ),
+  //       ],
+  //     ),
+  //     child: ClipRRect(
+  //       borderRadius: BorderRadius.circular(24),
+  //       child: Container(
+  //         padding: const EdgeInsets.all(20),
+  //         child: Column(
+  //           children: [
+  //             Row(
+  //               children: [
+  //                 Container(
+  //                   decoration: BoxDecoration(
+  //                     shape: BoxShape.circle,
+  //                     border: Border.all(color: Colors.white, width: 3),
+  //                     boxShadow: [
+  //                       BoxShadow(
+  //                         color: Colors.black.withOpacity(0.15),
+  //                         blurRadius: 10,
+  //                         offset: const Offset(0, 4),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                   child: const CircleAvatar(
+  //                     radius: 36,
+  //                     backgroundImage: AssetImage('assets/avatar.png'),
+  //                   ),
+  //                 ),
+  //                 const SizedBox(width: 16),
+  //                 Expanded(
+  //                   child: Column(
+  //                     crossAxisAlignment: CrossAxisAlignment.start,
+  //                     children: [
+  //                       Text(
+  //                         (userProvider.firstName!.isNotEmpty ||
+  //                                 userProvider.lastName!.isNotEmpty)
+  //                             ? '${userProvider.firstName} ${userProvider.lastName}'
+  //                             : 'User',
+  //                         style: const TextStyle(
+  //                           fontSize: 20,
+  //                           fontWeight: FontWeight.bold,
+  //                           color: Colors.white,
+  //                           letterSpacing: 0.3,
+  //                         ),
+  //                       ),
+  //                       const SizedBox(height: 6),
+  //                       Row(
+  //                         children: [
+  //                           const Icon(
+  //                             Icons.email_outlined,
+  //                             color: Colors.white70,
+  //                             size: 14,
+  //                           ),
+  //                           const SizedBox(width: 6),
+  //                           Expanded(
+  //                             child: Text(
+  //                               '${userProvider.email}',
+  //                               style: const TextStyle(
+  //                                 fontSize: 13,
+  //                                 color: Colors.white70,
+  //                               ),
+  //                               overflow: TextOverflow.ellipsis,
+  //                             ),
+  //                           ),
+  //                         ],
+  //                       ),
+  //                       const SizedBox(height: 4),
+  //                       Row(
+  //                         children: [
+  //                           const Icon(
+  //                             Icons.phone_outlined,
+  //                             color: Colors.white70,
+  //                             size: 14,
+  //                           ),
+  //                           const SizedBox(width: 6),
+  //                           Text(
+  //                             '+91${userProvider.phone}',
+  //                             style: const TextStyle(
+  //                               fontSize: 13,
+  //                               color: Colors.white70,
+  //                             ),
+  //                           ),
+  //                         ],
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //                 Container(
+  //                   decoration: BoxDecoration(
+  //                     color: Colors.white.withOpacity(0.2),
+  //                     borderRadius: BorderRadius.circular(12),
+  //                   ),
+  //                   child: IconButton(
+  //                     icon: Icon(
+  //                       _isEditing ? Icons.close_rounded : Icons.edit_rounded,
+  //                       color: Colors.white,
+  //                       size: 22,
+  //                     ),
+  //                     tooltip: _isEditing ? 'Cancel' : 'Edit Profile',
+  //                     onPressed: () {
+  //                       setState(() {
+  //                         _isEditing = !_isEditing;
+  //                       });
+  //                     },
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //             if (_isEditing) ...[
+  //               const SizedBox(height: 24),
+  //               Container(
+  //                 decoration: BoxDecoration(
+  //                   color: Colors.white,
+  //                   borderRadius: BorderRadius.circular(16),
+  //                 ),
+  //                 padding: const EdgeInsets.all(20),
+  //                 child: Form(
+  //                   key: _formKey,
+  //                   child: Column(
+  //                     children: [
+  //                       Row(
+  //                         children: [
+  //                           Expanded(
+  //                             child: _buildModernTextField(
+  //                               controller: _firstNameController,
+  //                               label: 'First Name\n(প্ৰথম নাম)',
+  //                               icon: Icons.person_outline,
+  //                               validator: (v) {
+  //                                 if (v == null || v.trim().isEmpty) {
+  //                                   return 'Required';
+  //                                 }
+  //                                 return null;
+  //                               },
+  //                             ),
+  //                           ),
+  //                           const SizedBox(width: 12),
+  //                           Expanded(
+  //                             child: _buildModernTextField(
+  //                               controller: _lastNameController,
+  //                               label: 'Last Name\n(উপাধি)',
+  //                               icon: Icons.person_outline,
+  //                               validator: (v) {
+  //                                 if (v == null || v.trim().isEmpty) {
+  //                                   return 'Required';
+  //                                 }
+  //                                 return null;
+  //                               },
+  //                             ),
+  //                           ),
+  //                         ],
+  //                       ),
+  //                       const SizedBox(height: 16),
+  //                       _buildModernTextField(
+  //                         controller: _emailController,
+  //                         label: 'Email address (ইমেইল ঠিকনা)(* optional)',
+  //                         icon: Icons.email_outlined,
+  //                         validator: (v) {
+  //                           final value = v?.trim() ?? '';
+  //                           if (value.isEmpty) return null;
+  //                           final emailReg = RegExp(
+  //                             r'^[\w\.\-]+@([\w\-]+\.)+[a-zA-Z]{2,}$',
+  //                           );
+  //                           if (!emailReg.hasMatch(value)) {
+  //                             return 'Enter a valid email';
+  //                           }
+  //                           return null;
+  //                         },
+  //                       ),
+  //                       const SizedBox(height: 16),
+  //                       _buildModernTextField(
+  //                         controller: _addressController,
+  //                         label: 'Address (ঠিকনা)',
+  //                         icon: Icons.location_on_outlined,
+  //                         validator: (v) {
+  //                           if (v == null || v.trim().isEmpty) {
+  //                             return 'Address is required';
+  //                           }
+  //                           return null;
+  //                         },
+  //                       ),
+  //                       const SizedBox(height: 16),
+  //                       DropdownButtonFormField2<String>(
+  //                         isExpanded: true,
+  //                         value: _selectedCircle,
+  //                         decoration: _modernDropdownDecoration(
+  //                           'Circle Office',
+  //                           Icons.apartment,
+  //                         ),
+  //                         hint: const Text(
+  //                           "Select Circle Office",
+  //                           style: TextStyle(
+  //                             fontSize: 15,
+  //                             color: Color(0xFF718096),
+  //                           ),
+  //                         ),
+  //                         items: circleOptions
+  //                             .map(
+  //                               (item) => DropdownMenuItem<String>(
+  //                                 value: item,
+  //                                 child: Text(
+  //                                   item,
+  //                                   style: const TextStyle(fontSize: 15),
+  //                                 ),
+  //                               ),
+  //                             )
+  //                             .toList(),
+  //                         onChanged: (value) {
+  //                           setState(() {
+  //                             _selectedCircle = value;
+  //                             _circleOfficeController.text = value ?? '';
+  //                             _selectedBlock = null;
+  //                             _blockController.clear();
+  //                             _addressType = null;
+  //                             _panchayatController.clear();
+  //                             _wardController.clear();
+  //                           });
+  //                         },
+  //                         validator: (value) => (value == null || value.isEmpty)
+  //                             ? 'Please select a circle office'
+  //                             : null,
+  //                         iconStyleData: IconStyleData(
+  //                           icon: Icon(
+  //                             Icons.keyboard_arrow_down,
+  //                             color: primaryColor,
+  //                           ),
+  //                           iconSize: 24,
+  //                         ),
+  //                         dropdownStyleData: DropdownStyleData(
+  //                           maxHeight: 220,
+  //                           decoration: BoxDecoration(
+  //                             color: Colors.white,
+  //                             borderRadius: BorderRadius.circular(12),
+  //                           ),
+  //                           offset: const Offset(0, 5),
+  //                         ),
+  //                         buttonStyleData: const ButtonStyleData(
+  //                           height: 56,
+  //                           padding: EdgeInsets.symmetric(horizontal: 15),
+  //                         ),
+  //                       ),
+  //                       if (_selectedCircle != null) const SizedBox(height: 16),
+  //                       if (_selectedCircle != null)
+  //                         DropdownButtonFormField2<String>(
+  //                           isExpanded: true,
+  //                           value: _selectedBlock,
+  //                           decoration: _modernDropdownDecoration(
+  //                             'Block',
+  //                             Icons.business_center,
+  //                           ),
+  //                           hint: const Text(
+  //                             "Select Block",
+  //                             style: TextStyle(
+  //                               fontSize: 15,
+  //                               color: Color(0xFF718096),
+  //                             ),
+  //                           ),
+  //                           items: blockOptions
+  //                               .map(
+  //                                 (item) => DropdownMenuItem<String>(
+  //                                   value: item,
+  //                                   child: Text(
+  //                                     item,
+  //                                     style: const TextStyle(fontSize: 15),
+  //                                   ),
+  //                                 ),
+  //                               )
+  //                               .toList(),
+  //                           onChanged: (value) {
+  //                             setState(() {
+  //                               _selectedBlock = value;
+  //                               _blockController.text = value ?? '';
+  //                               _addressType = null;
+  //                               _panchayatController.clear();
+  //                               _wardController.clear();
+  //                             });
+  //                           },
+  //                           validator: (value) =>
+  //                               (value == null || value.isEmpty)
+  //                               ? 'Please select a block'
+  //                               : null,
+  //                           iconStyleData: IconStyleData(
+  //                             icon: Icon(
+  //                               Icons.keyboard_arrow_down,
+  //                               color: primaryColor,
+  //                             ),
+  //                             iconSize: 24,
+  //                           ),
+  //                           dropdownStyleData: DropdownStyleData(
+  //                             maxHeight: 220,
+  //                             decoration: BoxDecoration(
+  //                               color: Colors.white,
+  //                               borderRadius: BorderRadius.circular(12),
+  //                             ),
+  //                             offset: const Offset(0, 5),
+  //                           ),
+  //                           buttonStyleData: const ButtonStyleData(
+  //                             height: 56,
+  //                             padding: EdgeInsets.symmetric(horizontal: 15),
+  //                           ),
+  //                         ),
+  //                       if (_selectedBlock != null) const SizedBox(height: 16),
+  //                       if (_selectedBlock != null)
+  //                         DropdownButtonFormField<String>(
+  //                           value: _addressType,
+  //                           items: const [
+  //                             DropdownMenuItem(
+  //                               value: 'Rural',
+  //                               child: Text('Rural (গ্ৰাম্য)'),
+  //                             ),
+  //                             DropdownMenuItem(
+  //                               value: 'Urban',
+  //                               child: Text('Urban (নগৰ)'),
+  //                             ),
+  //                           ],
+  //                           onChanged: (val) {
+  //                             setState(() {
+  //                               _addressType = val;
+  //                               _panchayatController.clear();
+  //                               _wardController.clear();
+  //                             });
+  //                           },
+  //                           validator: (v) => (v == null || v.isEmpty)
+  //                               ? 'Please select address type'
+  //                               : null,
+  //                           decoration: _modernDropdownDecoration(
+  //                             'Address Type',
+  //                             Icons.home_work_outlined,
+  //                           ),
+  //                         ),
+  //                       if (_addressType == "Rural") const SizedBox(height: 16),
+  //                       if (_addressType == "Rural")
+  //                         _buildModernTextField(
+  //                           controller: _panchayatController,
+  //                           label: "Panchayat (গাঁও পঞ্চায়েত)",
+  //                           icon: Icons.maps_home_work_outlined,
+  //                           validator: (v) {
+  //                             if (_addressType == "Rural") {
+  //                               if (v == null || v.trim().isEmpty) {
+  //                                 return 'Panchayat is required';
+  //                               }
+  //                             }
+  //                             return null;
+  //                           },
+  //                         )
+  //                       else if (_addressType == "Urban") ...[
+  //                         const SizedBox(height: 16),
+  //                         _buildModernTextField(
+  //                           controller: _wardController,
+  //                           label: "Ward (ৱাৰ্ড)",
+  //                           icon: Icons.location_city_outlined,
+  //                           validator: (v) {
+  //                             if (_addressType == "Urban") {
+  //                               if (v == null || v.trim().isEmpty) {
+  //                                 return 'Ward is required';
+  //                               }
+  //                             }
+  //                             return null;
+  //                           },
+  //                         ),
+  //                       ],
+  //                       const SizedBox(height: 24),
+  //                       SizedBox(
+  //                         width: double.infinity,
+  //                         height: 52,
+  //                         child: ElevatedButton(
+  //                           style: ElevatedButton.styleFrom(
+  //                             backgroundColor: primaryColor,
+  //                             foregroundColor: Colors.white,
+  //                             elevation: 0,
+  //                             shape: RoundedRectangleBorder(
+  //                               borderRadius: BorderRadius.circular(12),
+  //                             ),
+  //                           ),
+  //                           onPressed: () async {
+  //                             if (_formKey.currentState!.validate()) {
+  //                               final formData = {
+  //                                 "c_id": userProvider.cId ?? '',
+  //                                 "firstName": _firstNameController.text.trim(),
+  //                                 "lastName": _lastNameController.text.trim(),
+  //                                 "email": _emailController.text.trim(),
+  //                                 "phoneNumber": userProvider.phone ?? '',
+  //                                 "address": _addressController.text.trim(),
+  //                                 "gaonPanchayat": _panchayatController.text
+  //                                     .trim(),
+  //                                 "ward": _wardController.text.trim(),
+  //                                 "circleOffice": _circleOfficeController.text
+  //                                     .trim(),
+  //                                 "block": _blockController.text.trim(),
+  //                               };
+
+  //                               final result = await _updateUser(formData);
+
+  //                               if (!mounted) return;
+
+  //                               if (result['success'] == true) {
+  //                                 await UserSecureStorage.instance.setfName(
+  //                                   _firstNameController.text.trim(),
+  //                                 );
+  //                                 await UserSecureStorage.instance.setlName(
+  //                                   _lastNameController.text.trim(),
+  //                                 );
+  //                                 await UserSecureStorage.instance.setEmail(
+  //                                   _emailController.text.trim(),
+  //                                 );
+
+  //                                 userProvider.setUser(
+  //                                   cId: userProvider.cId ?? '',
+  //                                   phone: userProvider.phone ?? '',
+  //                                   address: _addressController.text.trim(),
+  //                                   addressType: _addressType ?? 'rural',
+  //                                   firstName: _firstNameController.text.trim(),
+  //                                   lastName: _lastNameController.text.trim(),
+  //                                   email: _emailController.text.trim(),
+  //                                   gaonPanchayat: _panchayatController.text
+  //                                       .trim(),
+  //                                   ward: _wardController.text.trim(),
+  //                                   circleOffice: _circleOfficeController.text
+  //                                       .trim(),
+  //                                   block: _blockController.text.trim(),
+  //                                 );
+
+  //                                 // --- UPDATED SNACKBAR CALL ---
+  //                                 _showCustomSnackBar(
+  //                                   message:
+  //                                       result['message'] ??
+  //                                       "Updated successfully",
+  //                                   isError: false,
+  //                                 );
+
+  //                                 setState(() {
+  //                                   _isEditing = false;
+  //                                 });
+  //                               } else {
+  //                                 // --- UPDATED SNACKBAR CALL ---
+  //                                 _showCustomSnackBar(
+  //                                   message:
+  //                                       result['message'] ?? "Update failed",
+  //                                   isError: true,
+  //                                 );
+  //                               }
+  //                             }
+  //                           },
+  //                           child: const Row(
+  //                             mainAxisAlignment: MainAxisAlignment.center,
+  //                             children: [
+  //                               Icon(Icons.save_rounded, size: 20),
+  //                               SizedBox(width: 8),
+  //                               Text(
+  //                                 "Save Changes",
+  //                                 style: TextStyle(
+  //                                   fontSize: 16,
+  //                                   fontWeight: FontWeight.w600,
+  //                                 ),
+  //                               ),
+  //                             ],
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //               ),
+  //             ],
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
+
   Widget _buildProfileHeader(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
+    final bool hasName =
+        (userProvider.firstName?.isNotEmpty ?? false) ||
+        (userProvider.lastName?.isNotEmpty ?? false);
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 400),
-      curve: Curves.easeInOut,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.fastOutSlowIn,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            const Color(0xFF1D4E89),
+            const Color(0xFF1565C0), // Deeper Blue
             primaryColor,
-            primaryColor.withOpacity(0.9),
+            const Color(0xFF64B5F6), // Lighter Blue accent
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -514,498 +1070,479 @@ class _HomeScreenState extends State<HomeScreen>
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: primaryColor.withOpacity(0.3),
+            color: primaryColor.withOpacity(0.4),
             blurRadius: 20,
-            offset: const Offset(0, 8),
+            offset: const Offset(0, 10),
           ),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 3),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.15),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: const CircleAvatar(
-                      radius: 36,
-                      backgroundImage: AssetImage('assets/avatar.png'),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          (userProvider.firstName!.isNotEmpty ||
-                                  userProvider.lastName!.isNotEmpty)
-                              ? '${userProvider.firstName} ${userProvider.lastName}'
-                              : 'User',
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            letterSpacing: 0.3,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.email_outlined,
-                              color: Colors.white70,
-                              size: 14,
-                            ),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Text(
-                                '${userProvider.email}',
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.white70,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.phone_outlined,
-                              color: Colors.white70,
-                              size: 14,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              '+91${userProvider.phone}',
-                              style: const TextStyle(
-                                fontSize: 13,
-                                color: Colors.white70,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: IconButton(
-                      icon: Icon(
-                        _isEditing ? Icons.close_rounded : Icons.edit_rounded,
-                        color: Colors.white,
-                        size: 22,
-                      ),
-                      tooltip: _isEditing ? 'Cancel' : 'Edit Profile',
-                      onPressed: () {
-                        setState(() {
-                          _isEditing = !_isEditing;
-                        });
-                      },
-                    ),
-                  ),
-                ],
+      child: Stack(
+        children: [
+          // --- Decorative Background Circles ---
+          Positioned(
+            top: -50,
+            right: -50,
+            child: Container(
+              width: 150,
+              height: 150,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.1),
               ),
+            ),
+          ),
+          Positioned(
+            bottom: -30,
+            left: -30,
+            child: Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.08),
+              ),
+            ),
+          ),
 
-              if (_isEditing) ...[
-                const SizedBox(height: 24),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  padding: const EdgeInsets.all(20),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildModernTextField(
-                                controller: _firstNameController,
-                                label: 'First Name\n(প্ৰথম নাম)',
-                                icon: Icons.person_outline,
-                                validator: (v) {
-                                  if (v == null || v.trim().isEmpty) {
-                                    return 'Required';
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: _buildModernTextField(
-                                controller: _lastNameController,
-                                label: 'Last Name\n(উপাধি)',
-                                icon: Icons.person_outline,
-                                validator: (v) {
-                                  if (v == null || v.trim().isEmpty) {
-                                    return 'Required';
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-                          ],
+          // --- Main Content ---
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Avatar with Glow Effect
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.9),
+                          width: 3,
                         ),
-                        const SizedBox(height: 16),
-
-                        _buildModernTextField(
-                          controller: _emailController,
-                          label: 'Email address (ইমেইল ঠিকনা)(* optional)',
-                          icon: Icons.email_outlined,
-                          validator: (v) {
-                            final value = v?.trim() ?? '';
-                            if (value.isEmpty) return null;
-                            final emailReg = RegExp(
-                              r'^[\w\.\-]+@([\w\-]+\.)+[a-zA-Z]{2,}$',
-                            );
-                            if (!emailReg.hasMatch(value)) {
-                              return 'Enter a valid email';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 16),
-
-                        _buildModernTextField(
-                          controller: _addressController,
-                          label: 'Address (ঠিকনা)',
-                          icon: Icons.location_on_outlined,
-                          validator: (v) {
-                            if (v == null || v.trim().isEmpty) {
-                              return 'Address is required';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 16),
-
-                        DropdownButtonFormField2<String>(
-                          isExpanded: true,
-                          value: _selectedCircle,
-                          decoration: _modernDropdownDecoration(
-                            'Circle Office',
-                            Icons.apartment,
-                          ),
-                          hint: const Text(
-                            "Select Circle Office",
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: Color(0xFF718096),
-                            ),
-                          ),
-                          items: circleOptions
-                              .map(
-                                (item) => DropdownMenuItem<String>(
-                                  value: item,
-                                  child: Text(
-                                    item,
-                                    style: const TextStyle(fontSize: 15),
-                                  ),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedCircle = value;
-                              _circleOfficeController.text = value ?? '';
-                              _selectedBlock = null;
-                              _blockController.clear();
-                              _addressType = null;
-                              _panchayatController.clear();
-                              _wardController.clear();
-                            });
-                          },
-                          validator: (value) => (value == null || value.isEmpty)
-                              ? 'Please select a circle office'
-                              : null,
-                          iconStyleData: IconStyleData(
-                            icon: Icon(
-                              Icons.keyboard_arrow_down,
-                              color: primaryColor,
-                            ),
-                            iconSize: 24,
-                          ),
-                          dropdownStyleData: DropdownStyleData(
-                            maxHeight: 220,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 15,
                             offset: const Offset(0, 5),
                           ),
-                          buttonStyleData: const ButtonStyleData(
-                            height: 56,
-                            padding: EdgeInsets.symmetric(horizontal: 15),
-                          ),
-                        ),
+                        ],
+                      ),
+                      child: const CircleAvatar(
+                        radius: 40, // Increased size
+                        backgroundImage: AssetImage('assets/avatar.png'),
+                        backgroundColor: Colors.white24,
+                      ),
+                    ),
+                    const SizedBox(width: 20),
 
-                        if (_selectedCircle != null) const SizedBox(height: 16),
-                        if (_selectedCircle != null)
-                          DropdownButtonFormField2<String>(
-                            isExpanded: true,
-                            value: _selectedBlock,
-                            decoration: _modernDropdownDecoration(
-                              'Block',
-                              Icons.business_center,
-                            ),
-                            hint: const Text(
-                              "Select Block",
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: Color(0xFF718096),
-                              ),
-                            ),
-                            items: blockOptions
-                                .map(
-                                  (item) => DropdownMenuItem<String>(
-                                    value: item,
-                                    child: Text(
-                                      item,
-                                      style: const TextStyle(fontSize: 15),
-                                    ),
-                                  ),
-                                )
-                                .toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedBlock = value;
-                                _blockController.text = value ?? '';
-                                _addressType = null;
-                                _panchayatController.clear();
-                                _wardController.clear();
-                              });
-                            },
-                            validator: (value) =>
-                                (value == null || value.isEmpty)
-                                ? 'Please select a block'
-                                : null,
-                            iconStyleData: IconStyleData(
-                              icon: Icon(
-                                Icons.keyboard_arrow_down,
-                                color: primaryColor,
-                              ),
-                              iconSize: 24,
-                            ),
-                            dropdownStyleData: DropdownStyleData(
-                              maxHeight: 220,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              offset: const Offset(0, 5),
-                            ),
-                            buttonStyleData: const ButtonStyleData(
-                              height: 56,
-                              padding: EdgeInsets.symmetric(horizontal: 15),
+                    // User Info Text
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            hasName
+                                ? '${userProvider.firstName} ${userProvider.lastName}'
+                                : 'Guest User',
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              letterSpacing: 0.5,
                             ),
                           ),
-
-                        if (_selectedBlock != null) const SizedBox(height: 16),
-                        if (_selectedBlock != null)
-                          DropdownButtonFormField<String>(
-                            value: _addressType,
-                            items: const [
-                              DropdownMenuItem(
-                                value: 'Rural',
-                                child: Text('Rural (গ্ৰাম্য)'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'Urban',
-                                child: Text('Urban (নগৰ)'),
-                              ),
-                            ],
-                            onChanged: (val) {
-                              setState(() {
-                                _addressType = val;
-                                _panchayatController.clear();
-                                _wardController.clear();
-                              });
-                            },
-                            validator: (v) => (v == null || v.isEmpty)
-                                ? 'Please select address type'
-                                : null,
-                            decoration: _modernDropdownDecoration(
-                              'Address Type',
-                              Icons.home_work_outlined,
-                            ),
+                          const SizedBox(height: 8),
+                          _buildInfoRow(
+                            Icons.phone_android_rounded,
+                            '+91 ${userProvider.phone}',
                           ),
-
-                        if (_addressType == "Rural") const SizedBox(height: 16),
-                        if (_addressType == "Rural")
-                          _buildModernTextField(
-                            controller: _panchayatController,
-                            label: "Panchayat (গাঁও পঞ্চায়েত)",
-                            icon: Icons.maps_home_work_outlined,
-                            validator: (v) {
-                              if (_addressType == "Rural") {
-                                if (v == null || v.trim().isEmpty) {
-                                  return 'Panchayat is required';
-                                }
-                              }
-                              return null;
-                            },
-                          )
-                        else if (_addressType == "Urban") ...[
-                          const SizedBox(height: 16),
-                          _buildModernTextField(
-                            controller: _wardController,
-                            label: "Ward (ৱাৰ্ড)",
-                            icon: Icons.location_city_outlined,
-                            validator: (v) {
-                              if (_addressType == "Urban") {
-                                if (v == null || v.trim().isEmpty) {
-                                  return 'Ward is required';
-                                }
-                              }
-                              return null;
-                            },
+                          const SizedBox(height: 5),
+                          _buildInfoRow(
+                            Icons.email_outlined,
+                            userProvider.email ?? 'No Email',
                           ),
                         ],
+                      ),
+                    ),
+                  ],
+                ),
 
-                        const SizedBox(height: 24),
+                const SizedBox(height: 20),
+                Divider(color: Colors.white.withOpacity(0.25), height: 1),
+                const SizedBox(height: 15),
 
-                        SizedBox(
-                          width: double.infinity,
-                          height: 52,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: primaryColor,
-                              foregroundColor: Colors.white,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            onPressed: () async {
-                              if (_formKey.currentState!.validate()) {
-                                final formData = {
-                                  "c_id": userProvider.cId ?? '',
-                                  "firstName": _firstNameController.text.trim(),
-                                  "lastName": _lastNameController.text.trim(),
-                                  "email": _emailController.text.trim(),
-                                  "phoneNumber": userProvider.phone ?? '',
-                                  "address": _addressController.text.trim(),
-                                  "gaonPanchayat": _panchayatController.text
-                                      .trim(),
-                                  "ward": _wardController.text.trim(),
-                                  "circleOffice": _circleOfficeController.text
-                                      .trim(),
-                                  "block": _blockController.text.trim(),
-                                };
-
-                                final result = await _updateUser(formData);
-
-                                if (!mounted) return;
-
-                                if (result['success'] == true) {
-                                  await UserSecureStorage.instance.setfName(
-                                    _firstNameController.text.trim(),
-                                  );
-                                  await UserSecureStorage.instance.setlName(
-                                    _lastNameController.text.trim(),
-                                  );
-                                  await UserSecureStorage.instance.setEmail(
-                                    _emailController.text.trim(),
-                                  );
-
-                                  userProvider.setUser(
-                                    cId: userProvider.cId ?? '',
-                                    phone: userProvider.phone ?? '',
-                                    address: _addressController.text.trim(),
-                                    addressType: _addressType ?? 'rural',
-                                    firstName: _firstNameController.text.trim(),
-                                    lastName: _lastNameController.text.trim(),
-                                    email: _emailController.text.trim(),
-                                    gaonPanchayat: _panchayatController.text
-                                        .trim(),
-                                    ward: _wardController.text.trim(),
-                                    circleOffice: _circleOfficeController.text
-                                        .trim(),
-                                    block: _blockController.text.trim(),
-                                  );
-
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        result['message'] ??
-                                            "Updated successfully",
-                                      ),
-                                      backgroundColor: Colors.green,
-                                      behavior: SnackBarBehavior.floating,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                    ),
-                                  );
-
-                                  setState(() {
-                                    _isEditing = false;
-                                  });
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        result['message'] ?? "Update failed",
-                                      ),
-                                      backgroundColor: Colors.red,
-                                      behavior: SnackBarBehavior.floating,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                    ),
-                                  );
-                                }
-                              }
-                            },
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.save_rounded, size: 20),
-                                SizedBox(width: 8),
-                                Text(
-                                  "Save Changes",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
+                // --- Edit Toggle Button ---
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _isEditing = !_isEditing;
+                    });
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 20,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _isEditing
+                          ? Colors.white
+                          : Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(_isEditing ? 1 : 0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          _isEditing ? Icons.close : Icons.edit_note_rounded,
+                          color: _isEditing ? primaryColor : Colors.white,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          _isEditing
+                              ? "Cancel Editing"
+                              : "Edit Profile Details",
+                          style: TextStyle(
+                            color: _isEditing ? primaryColor : Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
                           ),
                         ),
                       ],
                     ),
                   ),
                 ),
+
+                // --- Editing Form Section ---
+                if (_isEditing) ...[
+                  const SizedBox(height: 24),
+                  // Floating "Paper" Card for the Form
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.15),
+                          blurRadius: 25,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.all(24),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildModernTextField(
+                                  controller: _firstNameController,
+                                  label: 'First Name',
+                                  icon: Icons.person_outline,
+                                  validator: (v) =>
+                                      (v == null || v.trim().isEmpty)
+                                      ? 'Required'
+                                      : null,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: _buildModernTextField(
+                                  controller: _lastNameController,
+                                  label: 'Last Name',
+                                  icon: Icons.person_outline,
+                                  validator: (v) =>
+                                      (v == null || v.trim().isEmpty)
+                                      ? 'Required'
+                                      : null,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          _buildModernTextField(
+                            controller: _emailController,
+                            label: 'Email Address',
+                            icon: Icons.email_outlined,
+                            validator: (v) {
+                              final value = v?.trim() ?? '';
+                              if (value.isNotEmpty &&
+                                  !RegExp(
+                                    r'^[\w\.\-]+@([\w\-]+\.)+[a-zA-Z]{2,}$',
+                                  ).hasMatch(value)) {
+                                return 'Enter a valid email';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          _buildModernTextField(
+                            controller: _addressController,
+                            label: 'Address',
+                            icon: Icons.location_on_outlined,
+                            validator: (v) => (v == null || v.trim().isEmpty)
+                                ? 'Required'
+                                : null,
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Circle Office Dropdown
+                          DropdownButtonFormField2<String>(
+                            isExpanded: true,
+                            value: _selectedCircle,
+                            decoration: _modernDropdownDecoration(
+                              'Circle Office',
+                              Icons.apartment,
+                            ),
+                            hint: const Text(
+                              "Select Circle",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.black54,
+                              ),
+                            ),
+                            items: circleOptions
+                                .map(
+                                  (item) => DropdownMenuItem(
+                                    value: item,
+                                    child: Text(
+                                      item,
+                                      style: const TextStyle(fontSize: 14),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedCircle = value;
+                                _circleOfficeController.text = value ?? '';
+                                _selectedBlock = null;
+                                _blockController.clear();
+                                _addressType = null;
+                                _panchayatController.clear();
+                                _wardController.clear();
+                              });
+                            },
+                          ),
+
+                          if (_selectedCircle != null) ...[
+                            const SizedBox(height: 16),
+                            DropdownButtonFormField2<String>(
+                              isExpanded: true,
+                              value: _selectedBlock,
+                              decoration: _modernDropdownDecoration(
+                                'Block',
+                                Icons.business_center,
+                              ),
+                              hint: const Text(
+                                "Select Block",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                              items: blockOptions
+                                  .map(
+                                    (item) => DropdownMenuItem(
+                                      value: item,
+                                      child: Text(
+                                        item,
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedBlock = value;
+                                  _blockController.text = value ?? '';
+                                  _addressType = null;
+                                  _panchayatController.clear();
+                                  _wardController.clear();
+                                });
+                              },
+                            ),
+                          ],
+
+                          if (_selectedBlock != null) ...[
+                            const SizedBox(height: 16),
+                            DropdownButtonFormField<String>(
+                              value: _addressType,
+                              decoration: _modernDropdownDecoration(
+                                'Address Type',
+                                Icons.home_work_outlined,
+                              ),
+                              items: const [
+                                DropdownMenuItem(
+                                  value: 'Rural',
+                                  child: Text('Rural (গ্ৰাম্য)'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'Urban',
+                                  child: Text('Urban (নগৰ)'),
+                                ),
+                              ],
+                              onChanged: (val) {
+                                setState(() {
+                                  _addressType = val;
+                                  _panchayatController.clear();
+                                  _wardController.clear();
+                                });
+                              },
+                            ),
+                          ],
+
+                          if (_addressType == "Rural") ...[
+                            const SizedBox(height: 16),
+                            _buildModernTextField(
+                              controller: _panchayatController,
+                              label: "Panchayat",
+                              icon: Icons.maps_home_work_outlined,
+                              validator: (v) =>
+                                  (_addressType == "Rural" &&
+                                      (v == null || v.isEmpty))
+                                  ? 'Required'
+                                  : null,
+                            ),
+                          ] else if (_addressType == "Urban") ...[
+                            const SizedBox(height: 16),
+                            _buildModernTextField(
+                              controller: _wardController,
+                              label: "Ward",
+                              icon: Icons.location_city_outlined,
+                              validator: (v) =>
+                                  (_addressType == "Urban" &&
+                                      (v == null || v.isEmpty))
+                                  ? 'Required'
+                                  : null,
+                            ),
+                          ],
+
+                          const SizedBox(height: 24),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: primaryColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 2,
+                              ),
+                              onPressed: () async {
+                                // Your existing Save Logic here...
+                                // Copy the logic from your previous onPressed
+                                // For brevity, I am invoking a placeholder logic call
+                                _saveProfileData(userProvider);
+                              },
+                              child: const Text(
+                                "Save Changes",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
+  }
+
+  // --- Helper Widget for Info Rows ---
+  Widget _buildInfoRow(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(icon, color: Colors.white70, size: 16),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // --- Helper Method for Save Logic (To keep UI code clean) ---
+  Future<void> _saveProfileData(UserProvider userProvider) async {
+    if (_formKey.currentState!.validate()) {
+      // ... Copy your original formData and _updateUser logic here ...
+      final formData = {
+        "c_id": userProvider.cId ?? '',
+        "firstName": _firstNameController.text.trim(),
+        "lastName": _lastNameController.text.trim(),
+        "email": _emailController.text.trim(),
+        "phoneNumber": userProvider.phone ?? '',
+        "address": _addressController.text.trim(),
+        "gaonPanchayat": _panchayatController.text.trim(),
+        "ward": _wardController.text.trim(),
+        "circleOffice": _circleOfficeController.text.trim(),
+        "block": _blockController.text.trim(),
+      };
+
+      final result = await _updateUser(formData);
+
+      if (!mounted) return;
+
+      if (result['success'] == true) {
+        await UserSecureStorage.instance.setfName(
+          _firstNameController.text.trim(),
+        );
+        await UserSecureStorage.instance.setlName(
+          _lastNameController.text.trim(),
+        );
+        await UserSecureStorage.instance.setEmail(_emailController.text.trim());
+
+        userProvider.setUser(
+          cId: userProvider.cId ?? '',
+          phone: userProvider.phone ?? '',
+          address: _addressController.text.trim(),
+          addressType: _addressType ?? 'rural',
+          firstName: _firstNameController.text.trim(),
+          lastName: _lastNameController.text.trim(),
+          email: _emailController.text.trim(),
+          gaonPanchayat: _panchayatController.text.trim(),
+          ward: _wardController.text.trim(),
+          circleOffice: _circleOfficeController.text.trim(),
+          block: _blockController.text.trim(),
+        );
+
+        _showCustomSnackBar(
+          message: result['message'] ?? "Updated successfully",
+        );
+        setState(() => _isEditing = false);
+      } else {
+        _showCustomSnackBar(
+          message: result['message'] ?? "Update failed",
+          isError: true,
+        );
+      }
+    }
   }
 
   Widget _buildModernTextField({

@@ -116,7 +116,7 @@ class _AuthGateState extends State<AuthGate>
         body: Stack(
           fit: StackFit.expand,
           children: [
-            Image.asset('assets/bgmain.png', fit: BoxFit.cover),
+            Image.asset('assets/bgmain2.png', fit: BoxFit.cover),
             BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
               child: Container(

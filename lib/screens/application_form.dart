@@ -38,7 +38,7 @@ class _ApplicationFormState extends State<ApplicationForm> {
   @override
   void initState() {
     super.initState();
-    _fetchCategories(); // ✨ NEW: Fetch categories when the form loads
+    _fetchCategories(); //  NEW: Fetch categories when the form loads
   }
 
   // ✨ NEW: Function to fetch categories from your server

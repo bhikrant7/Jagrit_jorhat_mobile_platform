@@ -2,10 +2,8 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/models/user_model.dart';
 import 'package:flutter_application_2/screens/authentication/login_screen.dart';
-
 import 'package:flutter_application_2/screens/home_screen.dart';
 import 'package:flutter_application_2/utils/otp_util.dart';
-// import 'package:flutter_application_2/screens/home_screen.dart';
 import 'package:flutter_application_2/widgets/custom_bg_scaffold.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -34,25 +32,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController circleOfficeController = TextEditingController();
 
   // Urban / Rural selection
-  String? urbanOrRural; // "Urban" or "Rural"
+  String? urbanOrRural;
 
   //state variable for selected values of block and circle
   String? selectedBlock;
   String? selectedCircle;
 
   final List<String> blockOptions = [
-    'East Teok\n(পূব তেওক)',
-    'Central Jorhat\n(মধ্য জোৰহাট)',
-    'East Jorhat\n(পূব জোৰহাট)',
+    'East Teok\n(পূব টীয়ক)',
+    'Central Jorhat\n(মধ্য যোৰহাট)',
+    'East Jorhat\n(পূব যোৰহাট)',
     'Kaliapani\n(কলিয়াপানী)',
-    'North West Jorhat\n(উত্তৰ-পশ্চিম জোৰহাট)',
+    'North West Jorhat\n(উত্তৰ-পশ্চিম যোৰহাট)',
     'Titabor\n(তিতাবৰ)',
   ];
 
   final List<String> circleOptions = [
     'Titabor Rev. Circle\n(তিতাবৰ ৰেভিনিউ চাৰ্কল)',
-    'Teok Rev. Circle\n(তেওক ৰেভিনিউ চাৰ্কল)',
-    'Mariani Rev. Circle\n(মাৰিয়ানী ৰেভিনিউ চাৰ্কল)',
+    'Teok Rev. Circle\n(টীয়ক ৰেভিনিউ চাৰ্কল)',
+    'Mariani Rev. Circle\n(মৰিয়নী ৰেভিনিউ চাৰ্কল)',
     'East Rev. Circle\n(পূব ৰেভিনিউ চাৰ্কল)',
     'West Rev. Circle\n(পশ্চিম ৰেভিনিউ চাৰ্কল)',
   ];
@@ -86,6 +84,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
+  // --- HELPER METHOD: Custom SnackBar ---
+  void _showCustomSnackBar({required String message, bool isError = false}) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              isError ? Icons.error_outline : Icons.check_circle_outline,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: isError ? Colors.redAccent : Colors.green[600],
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -104,587 +135,685 @@ class _RegisterScreenState extends State<RegisterScreen> {
             padding: EdgeInsets.only(top: topPadding),
             child: Container(
               height: MediaQuery.of(context).size.height,
-              padding: const EdgeInsets.fromLTRB(25.0, 50.0, 25.0, 20.0),
+              padding: const EdgeInsets.fromLTRB(25.0, 50.0, 25.0, 0.0),
               decoration: const BoxDecoration(
-                color: Colors.white,
+                color: Color.fromRGBO(237, 232, 228, 1),
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(40.0),
                   topRight: Radius.circular(40.0),
                 ),
               ),
-              child: SingleChildScrollView(
-                controller: _scrollController,
-                physics: const BouncingScrollPhysics(),
-                child: Form(
-                  key: _formRegisterKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Get Started',
-                        style: TextStyle(
-                          fontSize: 30.0,
-                          fontWeight: FontWeight.w900,
-                          color: primaryColor,
-                        ),
-                      ),
-                      const SizedBox(height: 40.0),
-
-                      // First & Last Name
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildTextField(
-                              'First Name\n(প্ৰথম নাম)',
-                              'Enter First Name',
-                              firstNameController,
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: _buildTextField(
-                              'Last Name\n(উপাধি)',
-                              'Enter Last Name',
-                              lastNameController,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 25.0),
-
-                      _buildTextField(
-                        'Email address (ইমেইল ঠিকনা)(* optional)',
-                        'Enter email address',
-                        emailController,
-                      ),
-                      const SizedBox(height: 25.0),
-                      _buildTextField(
-                        'Phone Number (ফোন নম্বৰ)',
-                        'Enter phone number',
-                        phoneNumberController,
-                      ),
-                      const SizedBox(height: 25.0),
-                      _buildTextField(
-                        'Address (ঠিকনা)',
-                        'Enter Address',
-                        addressController,
-                      ),
-                      const SizedBox(height: 25.0),
-
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          // Circle Office Dropdown
-                          DropdownButtonHideUnderline(
-                            child: DropdownButton2<String>(
-                              isExpanded: true,
-                              value: selectedCircle,
-                              hint: const Text(
-                                "Select Circle Office (চাৰ্কল কাৰ্যালয়)",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                              items: circleOptions.map((item) {
-                                return DropdownMenuItem<String>(
-                                  value: item,
-                                  child: Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.apartment,
-                                        color: Colors.blue,
-                                      ),
-                                      const SizedBox(width: 10),
-                                      Text(
-                                        item,
-                                        style: const TextStyle(fontSize: 16),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedCircle = value;
-                                  circleOfficeController.text = value ?? '';
-                                  selectedBlock = null;
-                                  urbanOrRural = null; // Reset next field
-                                });
-                              },
-                              buttonStyleData: ButtonStyleData(
-                                height: 55,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 15,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(12),
-                                  // boxShadow: [
-                                  //   BoxShadow(
-                                  //     color: Colors.grey.shade300,
-                                  //     blurRadius: 8,
-                                  //     offset: const Offset(0, 4),
-                                  //   ),
-                                  // ],
-                                  border: Border.all(
-                                    color: Colors.blue.shade100,
-                                    width: 1.5,
-                                  ),
-                                ),
-                              ),
-                              dropdownStyleData: DropdownStyleData(
-                                maxHeight: 200,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                offset: const Offset(0, 5),
-                              ),
-                              iconStyleData: const IconStyleData(
-                                icon: Icon(
-                                  Icons.keyboard_arrow_down,
-                                  color: Colors.blue,
-                                ),
-                                iconSize: 24,
-                              ),
-                            ),
-                          ),
-
-                          // DropdownButtonFormField<String>(
-                          //   value: selectedCircle,
-                          //   decoration: InputDecoration(
-                          //     labelText: 'Circle Office',
-                          //     border: OutlineInputBorder(
-                          //       borderRadius: BorderRadius.circular(10),
-                          //     ),
-                          //   ),
-                          //   items: circleOptions.map((circle) {
-                          //     return DropdownMenuItem(
-                          //       value: circle,
-                          //       child: Text(circle),
-                          //     );
-                          //   }).toList(),
-                          //   onChanged: (value) {
-                          //     setState(() {
-                          //       selectedCircle = value;
-                          //       circleOfficeController.text = value ?? '';
-                          //       selectedBlock = null; // Reset next field
-                          //     });
-                          //   },
-                          //   validator: (value) {
-                          //     if (value == null || value.isEmpty) {
-                          //       return 'Please select a circle office';
-                          //     }
-                          //     return null;
-                          //   },
-                          // ),
-                          
-
-                          // Show Block only after Circle selected
-                          if (selectedCircle != null)
-                            const SizedBox(height: 25.0),
-                          if (selectedCircle != null)
-                            DropdownButtonHideUnderline(
-                              child: DropdownButton2<String>(
-                                isExpanded: true,
-                                value: selectedBlock,
-                                hint: const Text(
-                                  "Select Block (ব্লক)",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                items: blockOptions.map((item) {
-                                  return DropdownMenuItem<String>(
-                                    value: item,
-                                    child: Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.business_center,
-                                          color: Colors.green,
-                                        ),
-                                        const SizedBox(width: 10),
-                                        Text(
-                                          item,
-                                          style: const TextStyle(fontSize: 16),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }).toList(),
-                                onChanged: (value) {
-                                  setState(() {
-                                    selectedBlock = value;
-                                    blockController.text = value ?? '';
-                                    urbanOrRural = null; // Reset next field
-                                    
-                                  });
-                                },
-                                buttonStyleData: ButtonStyleData(
-                                  height: 55,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 15,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(12),
-                                    // boxShadow: [
-                                    //   BoxShadow(
-                                    //     color: Colors.grey.shade300,
-                                    //     blurRadius: 8,
-                                    //     offset: const Offset(0, 4),
-                                    //   ),
-                                    // ],
-                                    border: Border.all(
-                                      color: Colors.green.shade100,
-                                      width: 1.5,
-                                    ),
-                                  ),
-                                ),
-                                dropdownStyleData: DropdownStyleData(
-                                  maxHeight: 200,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  offset: const Offset(0, 5),
-                                ),
-                                iconStyleData: const IconStyleData(
-                                  icon: Icon(
-                                    Icons.keyboard_arrow_down,
-                                    color: Colors.green,
-                                  ),
-                                  iconSize: 24,
-                                ),
-                              ),
-                            ),
-
-                          // DropdownButtonFormField<String>(
-                          //   value: selectedBlock,
-                          //   decoration: InputDecoration(
-                          //     labelText: 'Block',
-                          //     border: OutlineInputBorder(
-                          //       borderRadius: BorderRadius.circular(10),
-                          //     ),
-                          //   ),
-                          //   items: blockOptions.map((block) {
-                          //     return DropdownMenuItem(
-                          //       value: block,
-                          //       child: Text(block),
-                          //     );
-                          //   }).toList(),
-                          //   onChanged: (value) {
-                          //     setState(() {
-                          //       selectedBlock = value;
-                          //       blockController.text = value ?? '';
-                          //       urbanOrRural = null; // Reset next field
-                          //     });
-                          //   },
-                          //   validator: (value) {
-                          //     if (value == null || value.isEmpty) {
-                          //       return 'Please select a block';
-                          //     }
-                          //     return null;
-                          //   },
-                          // ),
-                          if (selectedBlock != null)
-                            const SizedBox(height: 25.0),
-
-                          // Show Address Type only after Block selected
-                          if (selectedBlock != null)
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Address Type: (ঠিকনাৰ ধৰণ)',
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                                const SizedBox(height: 8),
-                                ToggleButtons(
-                                  selectedBorderColor: Colors.blue.shade100,
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderWidth: 2,
-                                  selectedColor: Colors.white,
-                                  fillColor: primaryColor,
-                                  color: Colors.black,
-                                  constraints: BoxConstraints.expand(
-                                    width:
-                                        MediaQuery.of(context).size.width / 3,
-                                  ), // Equal width
-                                  isSelected: [
-                                    urbanOrRural == 'Urban',
-                                    urbanOrRural == 'Rural',
-                                  ],
-                                  onPressed: (index) {
-                                    setState(() {
-                                      urbanOrRural = index == 0
-                                          ? 'Urban'
-                                          : 'Rural';
-                                      gaonPanchayatController.clear();
-                                      wardController.clear();
-                                    });
-                                  },
-                                  children: const [
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 20,
-                                      ),
-                                      child: Text("Urban (নগৰ)"),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 20,
-                                      ),
-                                      child: Text("Rural (গ্ৰাম্য)"),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-
-                          const SizedBox(height: 16),
-
-                          // Show Ward or Gaon Panchayat based on Urban/Rural
-                          if (urbanOrRural == 'Rural')
-                            _buildTextField(
-                              'Gaon Panchayat (গাঁও পঞ্চায়েত)',
-                              'Enter Gaon Panchayat',
-                              gaonPanchayatController,
-                            )
-                          else if (urbanOrRural == 'Urban')
-                            _buildTextField(
-                              'Ward (ৱাৰ্ড)',
-                              'Enter Ward',
-                              wardController,
-                            ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: agreePersonalData,
-                            onChanged: (bool? value) {
-                              setState(() {
-                                agreePersonalData = value ?? false;
-                              });
-                            },
-                            activeColor: primaryColor,
-                          ),
-                          const Text(
-                            'I agree to the processing of ',
-                            style: TextStyle(color: Colors.black45),
-                          ),
-                          Text(
-                            'Personal data',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: primaryColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 25.0),
-
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: primaryColor,
-                          ),
-                          onPressed: isSubmitting
-                              ? null
-                              : () async {
-                                  if (_formRegisterKey.currentState!
-                                          .validate() &&
-                                      agreePersonalData) {
-                                    // Show snackbar for "processing"
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          "Submitting registration...",
-                                        ),
-                                      ),
-                                    );
-
-                                    final formData = {
-                                      "c_id": "",
-                                      "firstName": firstNameController.text,
-                                      "lastName": lastNameController.text,
-                                      "email": emailController.text,
-                                      "phoneNumber": phoneNumberController.text,
-                                      "address": addressController.text,
-                                      "address_type": urbanOrRural?.toLowerCase() ?? 'rural',
-                                      "gaonPanchayat":
-                                          gaonPanchayatController.text,
-                                      "block": blockController.text,
-                                      "circleOffice":
-                                          circleOfficeController.text,
-
-                                      "ward": wardController.text,
-                                    };
-
-                                    //model instance
-                                    UserModel userData = UserModel(
-                                      cId: '', //comes from backend
-                                      firstName: firstNameController.text,
-                                      lastName: lastNameController.text,
-                                      email: emailController.text,
-                                      phone: phoneNumberController.text,
-                                      address: addressController.text,
-                                      addressType: urbanOrRural?.toLowerCase() ?? 'rural',
-                                      gaonPanchayat:
-                                          gaonPanchayatController.text,
-                                      block: blockController.text,
-                                      circleOffice: circleOfficeController.text,
-                                      ward: wardController.text,
-                                      // district: districtController.text,
-                                      // state: stateController.text,
-                                      emailVerifiedAt: null,
-                                      rememberToken: null,
-                                      createdAt: DateTime.now()
-                                          .toIso8601String(),
-                                      updatedAt: DateTime.now()
-                                          .toIso8601String(),
-                                    );
-
-                                    final result = await submitFormData(
-                                      formData,
-                                    );
-
-                                    if (!mounted) {
-                                      return;
-                                    } //  guard context
-
-                                    if (result != null &&
-                                        result['success'] == true) {
-                                      ScaffoldMessenger.of(
-                                        // ignore: use_build_context_synchronously
-                                        context,
-                                      ).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            result['message'] ??
-                                                'Registered user.Please verify your number',
-                                          ),
-                                        ),
-                                      );
-                                      final phoneNum =
-                                          phoneNumberController.text;
-                                      // Reset form
-                                      _formRegisterKey.currentState!.reset();
-
-                                      // Clear all controllers
-                                      firstNameController.clear();
-                                      lastNameController.clear();
-                                      emailController.clear();
-                                      phoneNumberController.clear();
-                                      addressController.clear();
-                                      gaonPanchayatController.clear();
-                                      wardController.clear();
-                                      blockController.clear();
-                                      circleOfficeController.clear();
-                                      //
-
-                                      Future.delayed(Duration(seconds: 2), () {
-                                        if (!mounted) return; // ✅ Fix again
-                                        Navigator.pushReplacement(
-                                          // ignore: use_build_context_synchronously
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => OtpScreenUtil(
-                                              destination: HomeScreen(),
-                                              user: userData,
-                                              phone: phoneNum,
-                                              isPasswordReset: false,
-                                            ),
-                                          ),
-                                        );
-                                      });
-                                    } else {
-                                      ScaffoldMessenger.of(
-                                        // ignore: use_build_context_synchronously
-                                        context,
-                                      ).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            result?['message'] ??
-                                                'Registration failed',
-                                          ),
-                                        ),
-                                      );
-                                    }
-                                  } else if (!agreePersonalData) {
-                                    if (!mounted) {
-                                      return;
-                                    } //  Fix: guard context
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Please agree to the processing of personal data',
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                },
-
-                          child: isSubmitting
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white,
-                                    ),
-                                  ),
-                                )
-                              : const Text(
-                                  'Sign up (চাইন আপ)',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                        ),
-                      ),
-                      const SizedBox(height: 30.0),
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text(
-                            'Already have an account? ',
-                            style: TextStyle(color: Colors.black45),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const LoginScreen(),
-                                ),
-                              );
-                            },
-                            child: Text(
-                              'Sign in',
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      controller: _scrollController,
+                      physics: const BouncingScrollPhysics(),
+                      child: Form(
+                        key: _formRegisterKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Register here!',
                               style: TextStyle(
-                                fontWeight: FontWeight.bold,
+                                fontSize: 30.0,
+                                fontWeight: FontWeight.w900,
                                 color: primaryColor,
                               ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 40.0),
+
+                            // First & Last Name
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _buildModernTextField(
+                                    controller: firstNameController,
+                                    label: 'First Name\n(প্ৰথম নাম)',
+                                    hint: 'First Name',
+                                    icon: Icons.person_outline,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: _buildModernTextField(
+                                    controller: lastNameController,
+                                    label: 'Last Name\n(উপাধি)',
+                                    hint: 'Last Name',
+                                    icon: Icons.person_outline,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16.0),
+
+                            _buildModernTextField(
+                              controller: emailController,
+                              label: 'Email address (ইমেইল ঠিকনা)(* optional)',
+                              hint: 'example@gmail.com',
+                              icon: Icons.email_outlined,
+                            ),
+                            const SizedBox(height: 16.0),
+                            _buildModernTextField(
+                              controller: phoneNumberController,
+                              label: 'Phone Number (ফোন নম্বৰ)',
+                              hint: '10-digit number',
+                              icon: Icons.phone_android,
+                              isNumber: true,
+                            ),
+                            const SizedBox(height: 16.0),
+                            _buildModernTextField(
+                              controller: addressController,
+                              label: 'Address (ঠিকনা)',
+                              hint: 'Enter your address',
+                              icon: Icons.home_outlined,
+                            ),
+                            const SizedBox(height: 25.0),
+
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                // Circle Office Dropdown
+                                DropdownButtonHideUnderline(
+                                  child: DropdownButton2<String>(
+                                    isExpanded: true,
+                                    value: selectedCircle,
+                                    hint: const Text(
+                                      "Select Circle Office (চাৰ্কল কাৰ্যালয়)",
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        color: Colors.black54,
+                                      ),
+                                    ),
+                                    items: circleOptions.map((item) {
+                                      return DropdownMenuItem<String>(
+                                        value: item,
+                                        child: Text(
+                                          item,
+                                          style: const TextStyle(fontSize: 15),
+                                        ),
+                                      );
+                                    }).toList(),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        selectedCircle = value;
+                                        circleOfficeController.text =
+                                            value ?? '';
+                                        selectedBlock = null;
+                                        urbanOrRural = null;
+                                      });
+                                    },
+                                    buttonStyleData: ButtonStyleData(
+                                      height: 55,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: const Color.fromRGBO(
+                                          237,
+                                          232,
+                                          228,
+                                          1,
+                                        ),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: Colors.black12,
+                                          width: 2.0,
+                                        ),
+                                      ),
+                                    ),
+                                    dropdownStyleData: DropdownStyleData(
+                                      maxHeight: 200,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    iconStyleData: IconStyleData(
+                                      icon: Icon(
+                                        Icons.keyboard_arrow_down,
+                                        color: primaryColor,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                                if (selectedCircle != null)
+                                  const SizedBox(height: 16.0),
+
+                                // Block Dropdown
+                                if (selectedCircle != null)
+                                  DropdownButtonHideUnderline(
+                                    child: DropdownButton2<String>(
+                                      isExpanded: true,
+                                      value: selectedBlock,
+                                      hint: const Text(
+                                        "Select Block (ব্লক)",
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.black54,
+                                        ),
+                                      ),
+                                      items: blockOptions.map((item) {
+                                        return DropdownMenuItem<String>(
+                                          value: item,
+                                          child: Text(
+                                            item,
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          selectedBlock = value;
+                                          blockController.text = value ?? '';
+                                          urbanOrRural = null;
+                                        });
+                                      },
+                                      buttonStyleData: ButtonStyleData(
+                                        height: 55,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: const Color.fromRGBO(
+                                            237,
+                                            232,
+                                            228,
+                                            1,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                          border: Border.all(
+                                            color: Colors.black12,
+                                            width: 2.0,
+                                          ),
+                                        ),
+                                      ),
+                                      dropdownStyleData: DropdownStyleData(
+                                        maxHeight: 200,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                      ),
+                                      iconStyleData: IconStyleData(
+                                        icon: Icon(
+                                          Icons.keyboard_arrow_down,
+                                          color: primaryColor,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+
+                                if (selectedBlock != null)
+                                  const SizedBox(height: 16.0),
+
+                                // Show Address Type only after Block selected
+                                // ... inside your Column children ...
+                                if (selectedBlock != null)
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'Address Type: (ঠিকনাৰ ধৰণ)',
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+
+                                      // FIX: Custom "Toggle" using Row + Expanded to guarantee NO OVERFLOW
+                                      Container(
+                                        height: 45,
+                                        decoration: BoxDecoration(
+                                          color:
+                                              primaryColor, // Background color for selected state logic
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                          border: Border.all(
+                                            color: primaryColor,
+                                            width: 1.5,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            // Option 1: Urban
+                                            Expanded(
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    urbanOrRural = 'Urban';
+                                                    gaonPanchayatController
+                                                        .clear();
+                                                    wardController.clear();
+                                                  });
+                                                },
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    // If Urban is selected, it's trans parent (showing blue bg).
+                                                    // If NOT selected, it's white.
+                                                    color:
+                                                        urbanOrRural == 'Urban'
+                                                        ? primaryColor
+                                                        : const Color.fromRGBO(237, 232, 228, 1),
+                                                    borderRadius:
+                                                        const BorderRadius.only(
+                                                          topLeft:
+                                                              Radius.circular(
+                                                                8,
+                                                              ),
+                                                          bottomLeft:
+                                                              Radius.circular(
+                                                                8,
+                                                              ),
+                                                        ),
+                                                  ),
+                                                  alignment: Alignment.center,
+                                                  child: Text(
+                                                    "Urban (নগৰ)",
+                                                    style: TextStyle(
+                                                      color:
+                                                          urbanOrRural ==
+                                                              'Urban'
+                                                          ? Colors.white
+                                                          : Colors.black54,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+
+                                            // Thin Divider line
+                                            Container(
+                                              width: 1,
+                                              color: primaryColor,
+                                            ),
+
+                                            // Option 2: Rural
+                                            Expanded(
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    urbanOrRural = 'Rural';
+                                                    gaonPanchayatController
+                                                        .clear();
+                                                    wardController.clear();
+                                                  });
+                                                },
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    color:
+                                                        urbanOrRural == 'Rural'
+                                                        ? primaryColor
+                                                        : const Color.fromRGBO(237, 232, 228, 1),
+                                                    borderRadius:
+                                                        const BorderRadius.only(
+                                                          topRight:
+                                                              Radius.circular(
+                                                                8,
+                                                              ),
+                                                          bottomRight:
+                                                              Radius.circular(
+                                                                8,
+                                                              ),
+                                                        ),
+                                                  ),
+                                                  alignment: Alignment.center,
+                                                  child: Text(
+                                                    "Rural (গ্ৰাম্য)",
+                                                    style: TextStyle(
+                                                      color:
+                                                          urbanOrRural ==
+                                                              'Rural'
+                                                          ? Colors.white
+                                                          : Colors.black54,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                // ... rest of your code
+                                const SizedBox(height: 16),
+
+                                // Show Ward or Gaon Panchayat
+                                if (urbanOrRural == 'Rural')
+                                  _buildModernTextField(
+                                    controller: gaonPanchayatController,
+                                    label: 'Gaon Panchayat (গাঁও পঞ্চায়েত)',
+                                    hint: 'Enter Panchayat',
+                                    icon: Icons.holiday_village_outlined,
+                                  )
+                                else if (urbanOrRural == 'Urban')
+                                  _buildModernTextField(
+                                    controller: wardController,
+                                    label: 'Ward (ৱাৰ্ড)',
+                                    hint: 'Enter Ward',
+                                    icon: Icons.location_city,
+                                  ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            Row(
+                              children: [
+                                Checkbox(
+                                  value: agreePersonalData,
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      agreePersonalData = value ?? false;
+                                    });
+                                  },
+                                  activeColor: primaryColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                ),
+                                const Expanded(
+                                  child: Wrap(
+                                    children: [
+                                      Text(
+                                        'I agree to the processing of ',
+                                        style: TextStyle(
+                                          color: Colors.black45,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                      Text(
+                                        'Personal data',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Color.fromARGB(
+                                            255,
+                                            65,
+                                            135,
+                                            197,
+                                          ),
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 25.0),
+
+                            SizedBox(
+                              width: double.infinity,
+                              height: 52,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: primaryColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                onPressed: isSubmitting
+                                    ? null
+                                    : () async {
+                                        // 1. VALIDATION
+                                        if (!_formRegisterKey.currentState!
+                                            .validate()) {
+                                          return; // Form validator handles UI messages
+                                        }
+
+                                        if (selectedCircle == null) {
+                                          _showCustomSnackBar(
+                                            message: "Select Circle Office",
+                                            isError: true,
+                                          );
+                                          return;
+                                        }
+                                        if (selectedBlock == null) {
+                                          _showCustomSnackBar(
+                                            message: "Select Block",
+                                            isError: true,
+                                          );
+                                          return;
+                                        }
+                                        if (urbanOrRural == null) {
+                                          _showCustomSnackBar(
+                                            message: "Select Address Type",
+                                            isError: true,
+                                          );
+                                          return;
+                                        }
+
+                                        if (!agreePersonalData) {
+                                          _showCustomSnackBar(
+                                            message:
+                                                "Please agree to personal data processing",
+                                            isError: true,
+                                          );
+                                          return;
+                                        }
+
+                                        // 2. SUBMISSION
+                                        setState(() => isSubmitting = true);
+
+                                        // Show processing snackbar
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              "Submitting registration...",
+                                            ),
+                                          ),
+                                        );
+
+                                        final formData = {
+                                          "c_id": "",
+                                          "firstName": firstNameController.text,
+                                          "lastName": lastNameController.text,
+                                          "email": emailController.text,
+                                          "phoneNumber":
+                                              phoneNumberController.text,
+                                          "address": addressController.text,
+                                          "address_type":
+                                              urbanOrRural?.toLowerCase() ??
+                                              'rural',
+                                          "gaonPanchayat":
+                                              gaonPanchayatController.text,
+                                          "block": blockController.text,
+                                          "circleOffice":
+                                              circleOfficeController.text,
+                                          "ward": wardController.text,
+                                        };
+
+                                        UserModel userData = UserModel(
+                                          cId: '',
+                                          firstName: firstNameController.text,
+                                          lastName: lastNameController.text,
+                                          email: emailController.text,
+                                          phone: phoneNumberController.text,
+                                          address: addressController.text,
+                                          addressType:
+                                              urbanOrRural?.toLowerCase() ??
+                                              'rural',
+                                          gaonPanchayat:
+                                              gaonPanchayatController.text,
+                                          block: blockController.text,
+                                          circleOffice:
+                                              circleOfficeController.text,
+                                          ward: wardController.text,
+                                          emailVerifiedAt: null,
+                                          rememberToken: null,
+                                          createdAt: DateTime.now()
+                                              .toIso8601String(),
+                                          updatedAt: DateTime.now()
+                                              .toIso8601String(),
+                                        );
+
+                                        final result = await submitFormData(
+                                          formData,
+                                        );
+
+                                        if (!mounted) return;
+                                        setState(() => isSubmitting = false);
+
+                                        if (result != null &&
+                                            result['success'] == true) {
+                                          _showCustomSnackBar(
+                                            message:
+                                                result['message'] ??
+                                                'Registered! Verify your number',
+                                          );
+
+                                          final phoneNum =
+                                              phoneNumberController.text;
+                                          _formRegisterKey.currentState!
+                                              .reset();
+                                          firstNameController.clear();
+                                          lastNameController.clear();
+                                          emailController.clear();
+                                          phoneNumberController.clear();
+                                          addressController.clear();
+                                          gaonPanchayatController.clear();
+                                          wardController.clear();
+                                          blockController.clear();
+                                          circleOfficeController.clear();
+                                          setState(() {
+                                            selectedCircle = null;
+                                            selectedBlock = null;
+                                            urbanOrRural = null;
+                                          });
+
+                                          Future.delayed(
+                                            const Duration(seconds: 2),
+                                            () {
+                                              if (!mounted) return;
+                                              Navigator.pushReplacement(
+                                                // ignore: use_build_context_synchronously
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (_) => OtpScreenUtil(
+                                                    destination:
+                                                        const HomeScreen(),
+                                                    user: userData,
+                                                    phone: phoneNum,
+                                                    isPasswordReset: false,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          );
+                                        } else {
+                                          _showCustomSnackBar(
+                                            message:
+                                                result?['message'] ??
+                                                'Registration failed',
+                                            isError: true,
+                                          );
+                                        }
+                                      },
+                                child: isSubmitting
+                                    ? const SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : const Text(
+                                        'Sign up (চাইন আপ)',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                              ),
+                            ),
+                            const SizedBox(height: 30.0),
+
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text(
+                                  'Already have an account? ',
+                                  style: TextStyle(color: Colors.black45),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const LoginScreen(),
+                                      ),
+                                    );
+                                  },
+                                  child: Text(
+                                    'Sign in',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: primaryColor,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 30.0),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 20.0),
-                    ],
+                    ),
                   ),
-                ),
+
+                  // --- Footer Section ---
+                  Visibility(
+                    visible: MediaQuery.of(context).viewInsets.bottom == 0,
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 20.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                'assets/govt_assam_white__.png',
+                                height: 40,
+                              ),
+                              const SizedBox(width: 12),
+                              const Text(
+                                'Government of Assam',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontStyle: FontStyle.italic,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black45,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Safe area for bottom
+                        SizedBox(height: MediaQuery.of(context).padding.bottom),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -693,42 +822,76 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildTextField(
-    String label,
-    String hint,
-    TextEditingController controllerText, {
-    bool obscure = false,
+  // --- MODERN TEXT FIELD HELPER ---
+  Widget _buildModernTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData icon,
+    bool isNumber = false,
   }) {
     return TextFormField(
-      controller: controllerText,
-      obscureText: obscure,
-      obscuringCharacter: '*',
+      controller: controller,
+      keyboardType: isNumber ? TextInputType.phone : TextInputType.text,
       validator: (value) {
-        if (label != 'Email address(* optional)' &&
-            (value == null || value.isEmpty)) {
-          return 'Please enter $label';
+        // 1. Email Optional Check
+        if (label.contains('Email')) {
+          if (value == null || value.isEmpty) {
+            return null; // Allowed to be empty
+          }
+          final emailRegex = RegExp(r'^[\w\.\-]+@([\w\-]+\.)+[a-zA-Z]{2,}$');
+          if (!emailRegex.hasMatch(value)) {
+            return 'Enter a valid email (e.g., abc@gmail.com)';
+          }
+          return null;
         }
-        if (label == 'Phone Number') {
+
+        // 2. Required Check for other fields
+        if (value == null || value.isEmpty) {
+          return 'Please enter ${label.split('\n')[0]}';
+        }
+
+        // 3. Phone Number Strict Check
+        if (isNumber || label.contains('Phone')) {
           final phoneRegex = RegExp(r'^\d{10}$');
-          if (!phoneRegex.hasMatch(value!)) {
+          if (!phoneRegex.hasMatch(value)) {
             return 'Phone number must be exactly 10 digits';
           }
         }
         return null;
       },
-
       decoration: InputDecoration(
-        label: Text(label),
+        labelText: label,
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.black26),
+        prefixIcon: Icon(icon, color: primaryColor, size: 20),
+        filled: true,
+        fillColor: const Color.fromRGBO(237, 232, 228, 1),
         border: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.black12),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.black12),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.black12, width: 2.0),
         ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: primaryColor, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.red, width: 1),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.red, width: 2),
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
+        labelStyle: const TextStyle(fontSize: 14),
       ),
     );
   }

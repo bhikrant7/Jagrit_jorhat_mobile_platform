@@ -225,7 +225,7 @@ class _SubmissionHistoryScreenState extends State<SubmissionHistoryScreen> {
                           Icon(Icons.attach_file, size: 18, color: Colors.grey),
                           SizedBox(width: 6),
                           Text(
-                            "Attachment (সংলগ্নক):",
+                            "Attachment (সংলগ্ন):",
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ],

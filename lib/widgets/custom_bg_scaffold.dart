@@ -23,7 +23,16 @@ class CustomBgScaffold extends StatelessWidget {
             height: double.infinity,
           ),
           SafeArea(
-            child: Padding(padding: const EdgeInsets.all(16.0), child: child!),
+            bottom: false, // This allows the child to reach the bottom edge
+            child: Padding(
+              // Change from .all(16.0) to .only to remove bottom padding
+              padding: const EdgeInsets.only(
+                left: 16.0,
+                right: 16.0,
+                top: 16.0,
+              ),
+              child: child!,
+            ),
           ),
         ],
       ),
