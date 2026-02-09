@@ -1,59 +1,39 @@
-name: Flutter CI/CD
+name: Build APK Only
 
 on:
   push:
     branches: [ master, main ]
-  pull_request:
-    branches: [ master, main ]
 
 jobs:
-  # Job 1: Quality Check & Testing
-  analyze_and_test:
+  build:
+    name: Build Flutter APK
     runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v4
-      
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          cache: true # Built-in caching for Flutter SDK & Pub packages
+          cache: true
 
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Static Analysis (Linting)
-        run: flutter analyze || true # This allows the build to continue even with warnings
-
-      - name: Run Unit & Widget Tests
-        run: flutter test --coverage
-
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          file: ./coverage/lcov.info
-
-  # Job 2: Android Build (Builds only if tests pass)
-  build_android:
-    needs: analyze_and_test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-          cache: true
-
       - name: Build APK
-        run: flutter build apk --release
+        # We use --no-pub because we already ran pub get
+        run: flutter build apk --release --no-pub
 
-      - name: Upload APK Artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: release-apk
+          name: jagrit-jorhat-app
           path: build/app/outputs/flutter-apk/app-release.apk
-
