@@ -48,6 +48,14 @@ jobs:
           keyAlias=${{ secrets.KEY_ALIAS }}
           storeFile=upload-keystore.jks
           EOF
+      
+      - name: create .env file for CI
+        run: |
+          cat > .env <<EOF
+          API_URL=https://jagritjorhat.assam.gov.in/jagrit/flutter_server
+          API_URL_EMULATOR=http://10.0.2.2:80/flutter_server
+          USE_EMULATOR=false
+          EOF
 
       - name: Build release APK
         run: flutter build apk --release
