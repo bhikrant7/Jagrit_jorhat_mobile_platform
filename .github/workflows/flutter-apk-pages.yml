@@ -1,15 +1,25 @@
 name: Build & Deploy Flutter APK to GitHub Pages
 
+# on:
+#   push:
+#     branches:
+#       - master
+#   workflow_dispatch:
+  
 on:
   push:
-    branches:
-      - master
+    tags:
+      - "v*"
   workflow_dispatch:
+
+# permissions:
+#   contents: write
+#   pages: write
+#   id-token: write
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
+
 
 jobs:
   build:
@@ -59,24 +69,32 @@ jobs:
 
       - name: Build release APK
         run: flutter build apk --release
-
-      - name: Prepare site files
-        run: |
-          mkdir -p public
-          cp build/app/outputs/flutter-apk/app-release.apk public/
-          echo "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Download App</title></head><body><h1>Download My Flutter App</h1><p><a href='app-release.apk'>Download APK</a></p></body></html>" > public/index.html
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+    
+      - name: Upload APK to GitHub Releases
+        uses: softprops/action-gh-release@v2
         with:
-          path: public
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v4
+          files: build/app/outputs/flutter-apk/app-release.apk
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
+
+
+      # - name: Prepare site files
+      #   run: |
+      #     mkdir -p public
+      #     cp build/app/outputs/flutter-apk/app-release.apk public/
+      #     echo "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Download App</title></head><body><h1>Download My Flutter App</h1><p><a href='app-release.apk'>Download APK</a></p></body></html>" > public/index.html
+
+      # - name: Upload Pages artifact
+      #   uses: actions/upload-pages-artifact@v3
+      #   with:
+      #     path: public
+
+  # deploy:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - name: Deploy to GitHub Pages
+  #       uses: actions/deploy-pages@v4
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.TOKEN }}
